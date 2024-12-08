@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password Validator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      margin: 20px;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #0073e6;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #0073e6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005bb5;
+    }
+
+    .errors {
+      margin-top: 15px;
+      color: red;
+    }
+
+    .success {
+      margin-top: 15px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Password Validator</h1>
+    <form id="passwordForm">
+      <input type="text" id="password" placeholder="Enter your password">
+      <button type="button" onclick="validate()">Validate</button>
+    </form>
+    <div id="output" class="errors"></div>
+  </div>
+
+  <script>
+    async function validate() {
+      const password = document.getElementById('password').value;
+      const output = document.getElementById('output');
+
+      const options = {
+        minLength: 8,
+        maxLength: 64,
+        blacklist: ['123456', 'password', 'qwerty'],
+        hibpCheck: true
+      };
+
+      const result = await validatePassword(password, options);
+
+      if (result.isValid) {
+        output.className = 'success';
+        output.textContent = 'Password is valid!';
+      } else {
+        output.className = 'errors';
+        output.textContent = 'Errors: ' + result.errors.join(', ');
+      }
+    }
+
+    // Mock implementation of validatePassword for testing
+    async function validatePassword(password, options) {
+      const errors = [];
+      if (password.length < options.minLength) errors.push('Password is too short.');
+      if (password.length > options.maxLength) errors.push('Password is too long.');
+      if (options.blacklist.includes(password)) errors.push('Password is blacklisted.');
+      if (options.hibpCheck == )
+      return { isValid: errors.length === 0, errors };
+    }
+  </script>
+</body>
+</html>

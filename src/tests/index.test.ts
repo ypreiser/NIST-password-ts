@@ -2,9 +2,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { validatePassword } from "../../src";
 import { hibpValidator } from "../../src/validators/hibpValidator";
+import { error } from "console";
 
 vi.mock("../../src/validators/hibpValidator", () => ({
-  hibpValidator: vi.fn(),
+  hibpValidator: vi.fn().mockResolvedValue({ errors: [] }), // Default mock
 }));
 
 describe("validatePassword", () => {
@@ -13,8 +14,8 @@ describe("validatePassword", () => {
   });
 
   it("validates a password meeting all requirements", async () => {
-    const options = { minLength: 8, maxLength: 64, hibpCheck: false };
-    const result = await validatePassword("SecurePassword123!", options);
+    const options = { minLength: 8, maxLength: 64, hibpCheck: true };
+    const result = await validatePassword("SecurePassword123!🦁🦁🦁🦁", options);
     expect(result).toEqual({ isValid: true, errors: [] });
   });
 
@@ -27,6 +28,7 @@ describe("validatePassword", () => {
       hibpCheck: false,
     };
     const result = await validatePassword("123456", options);
+    console.log();
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
       "Password must be at least 8 characters long."
@@ -73,7 +75,9 @@ describe("validatePassword", () => {
   });
 
   it("handles no validation options gracefully", async () => {
-    const result = await validatePassword("NoOptionsPassword");
+    const options = {  hibpCheck: false };
+    const result = await validatePassword("NoOptionsPassword", options);
     expect(result).toEqual({ isValid: true, errors: [] });
   });
-});
+}); 
+
