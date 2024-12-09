@@ -17,11 +17,12 @@ export async function hibpValidator(
 
     const response = await fetch(`${API_URL}${prefix}`);
     if (!response.ok) {
-        throw new Error("Failed to check password against HaveIBeenPwned API.");
-      }
+      const errorDetails = await response.text();
+      throw new Error(`Failed to check password against HaveIBeenPwned API. Status: ${response.status}, Details: ${errorDetails}`);
+    }
   
     const text = await response.text();
-    const found =text.includes(suffix);
+    const found = text.includes(suffix);
 
     return found
       ? {

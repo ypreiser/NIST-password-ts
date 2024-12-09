@@ -2,8 +2,12 @@
   "name": "secure-pw-validator",
   "version": "1.0.0",
   "main": "index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
-    "test": "vitest --coverage --ui"
+    "test": "vitest --coverage --ui",
+    "build": "tsup src --format esm,cjs --dts --clean"
   },
   "keywords": [],
   "author": "",

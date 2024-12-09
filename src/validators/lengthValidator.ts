@@ -1,16 +1,15 @@
 // src\validators\lengthValidator.ts
+import { getUtf8Length } from '../utils/utf8Length';
 import { ValidationResult } from '../types';
 
-export function lengthValidator(password: string, minLength: number, maxLength: number): ValidationResult {
+export function lengthValidator(
+  password: string,
+  min: number = 15,
+  max: number = 64
+): ValidationResult {
+  const length = getUtf8Length(password);
   const errors: string[] = [];
-
-  if (password.length < minLength) {
-    errors.push(`Password must be at least ${minLength} characters long.`);
-  }
-
-  if (password.length > maxLength) {
-    errors.push(`Password must be at most ${maxLength} characters long.`);
-  }
-
+  if (length < min) errors.push(`Password must be at least ${min} characters.`);
+  if (length > max) errors.push(`Password must not exceed ${max} characters.`);
   return { isValid: errors.length === 0, errors };
 }

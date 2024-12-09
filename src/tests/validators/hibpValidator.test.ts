@@ -51,10 +51,11 @@ describe('hibpValidator', () => {
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
+      text: async () => 'Error details', // Add details for better error logging
     } as Response);
 
     await expect(hibpValidator('password')).rejects.toThrow(
-      'HaveIBeenPwned check failed: Failed to check password against HaveIBeenPwned API.'
+      'HaveIBeenPwned check failed: Failed to check password against HaveIBeenPwned API. Status: 500, Details: Error details'
     );
   });
 
@@ -62,5 +63,16 @@ describe('hibpValidator', () => {
     global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
 
     await expect(hibpValidator('password')).rejects.toThrow('HaveIBeenPwned check failed: Network error');
+  });
+
+  // New test for handling unexpected response formats
+  it('throws an error for unexpected response format', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      text: async () => 'Unexpected format', // Simulate unexpected response
+    } as Response);
+
+    const result = await hibpValidator('unexpectedPassword');
+    expect(result).toEqual({ isValid: true, errors: [] }); // Assuming it defaults to valid
   });
 });

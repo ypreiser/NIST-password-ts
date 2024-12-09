@@ -1,4 +1,4 @@
-
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,103 +6,316 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Password Validator</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      margin: 20px;
-      padding: 20px;
+    :root {
+      --primary-color: #4F46E5;
+      --error-color: #DC2626;
+      --success-color: #059669;
+      --border-radius: 8px;
     }
 
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
       padding: 20px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      line-height: 1.6;
+      background-color: #F3F4F6;
+      color: #1F2937;
     }
 
     h1 {
       text-align: center;
-      color: #0073e6;
+      color: var(--primary-color);
+      margin-bottom: 2rem;
     }
 
-    input[type="text"] {
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .section {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #374151;
+      font-size: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #4B5563;
+      font-weight: 500;
+    }
+
+    .info-section {
+      max-width: 1200px;
+      margin: 0 auto 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .info-card {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .info-item {
+      position: relative;
+    }
+
+    .info-item h4 {
+      color: var(--primary-color);
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    .info-item p {
+      margin-top: 0;
+      color: #4B5563;
+    }
+
+    .info-item ul {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+      color: #4B5563;
+    }
+
+    .info-item li {
+      margin-bottom: 0.25rem;
+    }
+
+    .info-item h4 {
+      color: var
+
+    input, textarea, select {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #D1D5DB;
+      border-radius: var(--border-radius);
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
     }
 
     button {
       width: 100%;
-      padding: 10px;
-      background-color: #0073e6;
+      padding: 0.75rem;
+      background-color: var(--primary-color);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 500;
       cursor: pointer;
+      transition: background-color 0.2s;
     }
 
     button:hover {
-      background-color: #005bb5;
+      background-color: #4338CA;
     }
 
-    .errors {
-      margin-top: 15px;
-      color: red;
+    .output {
+      background: #F9FAFB;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      margin-top: 1rem;
+      white-space: pre-wrap;
+      font-family: monospace;
+      transition: all 0.3s ease;
     }
 
-    .success {
-      margin-top: 15px;
-      color: green;
+    .output.error {
+      background-color: #FEE2E2;
+      color: var(--error-color);
+    }
+
+    .output.success {
+      background-color: #ECFDF5;
+      color: var(--success-color);
+    }
+
+    .validation-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .validation-status::before {
+      content: "•";
+      font-size: 1.5rem;
+    }
+
+    .validation-status.error::before {
+      color: var(--error-color);
+    }
+
+    .validation-status.success::before {
+      color: var(--success-color);
     }
   </style>
 </head>
 <body>
+  <h1>Password Validator</h1>
+  <div class="info-section">
+    <div class="info-card">
+      <h3>Password Security Guidelines</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <h4>HIBP (Have I Been Pwned)</h4>
+          <p>HIBP checks if your password appears in known data breaches. If a password is found in the database, it's considered compromised and should not be used. This service uses k-anonymity to ensure your password is never sent in full during the check.</p>
+        </div>
+        <div class="info-item">
+          <h4>Industry Password Blacklists</h4>
+          <p>Password blacklists help prevent the use of commonly known weak passwords. Industry best practices recommend blocking:</p>
+          <ul>
+            <li>Dictionary words</li>
+            <li>Company-specific terms</li>
+            <li>Context-specific phrases</li>
+            <li>Previously breached passwords</li>
+          </ul>
+        </div>
+        <div class="info-item">
+          <h4>NIST Password Guidelines (SP 800-63B)</h4>
+          <p>Current NIST recommendations include:</p>
+          <ul>
+            <li>Minimum 8 characters (recommended 15+ for critical systems)</li>
+            <li>Maximum 64 characters</li>
+            <li>Allow all ASCII and Unicode characters</li>
+            <li>No password hints</li>
+            <li>No periodic password changes unless compromised</li>
+            <li>Check against compromised password lists</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="container">
-    <h1>Password Validator</h1>
-    <form id="passwordForm">
-      <input type="text" id="password" placeholder="Enter your password">
-      <button type="button" onclick="validate()">Validate</button>
-    </form>
-    <div id="output" class="errors"></div>
+    <!-- Input Section -->
+    <div class="section">
+      <h2>Password Input</h2>
+      <label for="password">Enter Password:</label>
+      <input 
+        type="password" 
+        id="password" 
+        placeholder="Enter your password"
+        autocomplete="new-password"
+      >
+      <button id="validateBtn">Validate Password</button>
+      <h3>Validation Output:</h3>
+      <div class="output" id="output">No validation yet.</div>
+    </div>
+
+    <!-- Options Section -->
+    <div class="section">
+      <h2>Validation Options</h2>
+      <label for="minLength">Minimum Length:</label>
+      <input type="number" id="minLength" value="15" min="1" max="64">
+      
+      <label for="maxLength">Maximum Length:</label>
+      <input type="number" id="maxLength" value="64" min="1" max="64">
+      
+      <label for="hibpCheck">HIBP Check:</label>
+      <select id="hibpCheck">
+        <option value="true" selected>Enabled</option>
+        <option value="false">Disabled</option>
+      </select>
+
+      <label for="blacklist">Blacklist (comma-separated):</label>
+      <textarea id="blacklist" placeholder="e.g., password, 123456"></textarea>
+    </div>
   </div>
 
-  <script>
-    async function validate() {
-      const password = document.getElementById('password').value;
-      const output = document.getElementById('output');
+  <!-- JavaScript -->
+  <script type="module">
+    import validatePassword from './dist/index.mjs';
+
+    const output = document.getElementById('output');
+    const passwordInput = document.getElementById('password');
+
+    // Reset output when starting to type a new password
+    passwordInput.addEventListener('input', () => {
+      output.className = 'output';
+      output.textContent = 'No validation yet.';
+    });
+
+    document.getElementById('validateBtn').addEventListener('click', async () => {
+      const password = passwordInput.value;
+      const minLength = parseInt(document.getElementById('minLength').value, 10);
+      const maxLength = parseInt(document.getElementById('maxLength').value, 10);
+      const hibpCheck = document.getElementById('hibpCheck').value === 'true';
+      const blacklist = document.getElementById('blacklist').value
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item);
 
       const options = {
-        minLength: 8,
-        maxLength: 64,
-        blacklist: ['123456', 'password', 'qwerty'],
-        hibpCheck: true
+        minLength,
+        maxLength,
+        hibpCheck,
+        blacklist,
       };
 
-      const result = await validatePassword(password, options);
+      try {
+        const result = await validatePassword(password, options);
+        
+        // Reset the output
+        output.innerHTML = '';
+        
+        // Add validation status
+        const statusDiv = document.createElement('div');
+        statusDiv.className = `validation-status ${result.isValid ? 'success' : 'error'}`;
+        statusDiv.textContent = result.isValid ? 'Password is valid' : 'Password is invalid';
+        output.appendChild(statusDiv);
 
-      if (result.isValid) {
-        output.className = 'success';
-        output.textContent = 'Password is valid!';
-      } else {
-        output.className = 'errors';
-        output.textContent = 'Errors: ' + result.errors.join(', ');
+        // Add errors if any
+        if (result.errors.length > 0) {
+          output.className = 'output error';
+          const errorsList = document.createElement('div');
+          errorsList.style.marginTop = '0.5rem';
+          result.errors.forEach(error => {
+            const errorDiv = document.createElement('div');
+            errorDiv.textContent = `• ${error}`;
+            errorsList.appendChild(errorDiv);
+          });
+          output.appendChild(errorsList);
+        } else {
+          output.className = 'output success';
+        }
+      } catch (error) {
+        output.className = 'output error';
+        output.innerHTML = `<div class="validation-status error">Error occurred</div>${error.message}`;
       }
-    }
-
-    // Mock implementation of validatePassword for testing
-    async function validatePassword(password, options) {
-      const errors = [];
-      if (password.length < options.minLength) errors.push('Password is too short.');
-      if (password.length > options.maxLength) errors.push('Password is too long.');
-      if (options.blacklist.includes(password)) errors.push('Password is blacklisted.');
-      if (options.hibpCheck == )
-      return { isValid: errors.length === 0, errors };
-    }
+    });
   </script>
 </body>
 </html>

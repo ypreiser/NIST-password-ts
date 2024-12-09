@@ -10,11 +10,11 @@ describe('lengthValidator', () => {
 
   it('returns error for password shorter than min length', () => {
     const result = lengthValidator('short', 8, 64);
-    expect(result).toEqual({ isValid: false, errors: ['Password must be at least 8 characters long.'] });
+    expect(result).toEqual({ isValid: false, errors: ['Password must be at least 8 characters.'] });
   });
 
   it('returns error for password longer than max length', () => {
     const result = lengthValidator('a'.repeat(65), 8, 64);
-    expect(result).toEqual({ isValid: false, errors: ['Password must be at most 64 characters long.'] });
+    expect(result).toEqual({ isValid: false, errors: ['Password must not exceed 64 characters.'] });
   });
 });

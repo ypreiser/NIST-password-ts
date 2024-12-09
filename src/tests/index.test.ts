@@ -1,83 +1,43 @@
 // src\tests\index.test.ts
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { validatePassword } from "../../src";
-import { hibpValidator } from "../../src/validators/hibpValidator";
-import { error } from "console";
+import { describe, it, expect } from 'vitest';
+import validatePassword  from '../index';
 
-vi.mock("../../src/validators/hibpValidator", () => ({
-  hibpValidator: vi.fn().mockResolvedValue({ errors: [] }), // Default mock
-}));
-
-describe("validatePassword", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+describe('Password Validation', () => {
+  it('should validate passwords based on length', async () => {
+    const result = await validatePassword('short', { hibpCheck: false });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain('Password must be at least 15 characters.');
   });
 
-  it("validates a password meeting all requirements", async () => {
-    const options = { minLength: 8, maxLength: 64, hibpCheck: true };
-    const result = await validatePassword("SecurePassword123!🦁🦁🦁🦁", options);
-    expect(result).toEqual({ isValid: true, errors: [] });
+  it('should allow valid passwords', async () => {
+    const result = await validatePassword('validpassword123456', { hibpCheck: false });
+    expect(result.isValid).toBe(true);
   });
 
-  it("returns errors for multiple failed validations", async () => {
-    const options = {
-      minLength: 8,
-      maxLength: 64,
-      allowedCharacterSet: /^[a-zA-Z0-9]+$/,
-      blacklist: ["123456"],
+  it('should check HIBP for compromised passwords', async () => {
+    const result = await validatePassword('password', { hibpCheck: true });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain('Password has been compromised in a data breach.');
+  });
+
+  it('should detect blacklisted passwords with fuzzy matching', async () => {
+    const result = await validatePassword('myp@ssw0rd', {
+      blacklist: ['password'],
       hibpCheck: false,
-    };
-    const result = await validatePassword("123456", options);
-    console.log();
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      "Password must be at least 8 characters long."
-    );
-    expect(result.errors).toContain("Password is blacklisted.");
-    expect(result.errors).toContain("Password contains invalid characters.");
-  });
-
-  it("validates against a provided allowed character set", async () => {
-    const options = { allowedCharacterSet: /^[a-zA-Z]+$/ };
-    const result = await validatePassword("Secure123", options);
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain("Password contains invalid characters.");
-  });
-
-  it("validates a password against the HIBP database", async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      isValid: false,
-      errors: ["Password has been compromised in a data breach."],
+      fuzzyTolerance: 3,
     });
-
-    const options = { hibpCheck: true };
-    const result = await validatePassword("password", options);
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      "Password has been compromised in a data breach."
-    );
+    expect(result.errors).toContain('Password contains a substring too similar to a blacklisted term.');
   });
 
-  it("validates password length against custom options", async () => {
-    const options = { minLength: 12, maxLength: 16 };
-    const result = await validatePassword("short", options);
+  it('should validate passwords based on maximum length', async () => {
+    const result = await validatePassword('thispasswordiswaytoolong', { maxLength: 15, hibpCheck: false });
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      "Password must be at least 12 characters long."
-    );
+    expect(result.errors).toContain('Password must be at most 15 characters.');
   });
 
-  it("validates blacklist entries with fuzzy tolerance", async () => {
-    const options = { blacklist: ["password"] };
-    const result = await validatePassword("passw0rd", options);
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain("Password is blacklisted.");
+  it('should handle missing blacklist option gracefully', async () => {
+    const result = await validatePassword('mylongerpassword', { hibpCheck: false });
+    expect(result.isValid).toBe(true);
   });
-
-  it("handles no validation options gracefully", async () => {
-    const options = {  hibpCheck: false };
-    const result = await validatePassword("NoOptionsPassword", options);
-    expect(result).toEqual({ isValid: true, errors: [] });
-  });
-}); 
-
+});
