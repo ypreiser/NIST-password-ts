@@ -7,8 +7,10 @@
     ".": "./dist/index.js"
   },
   "scripts": {
+    "build": "vite build",
+    "dev": "vite",
     "test": "vitest --coverage --ui",
-    "build": "tsc --outDir dist --declaration --sourceMap --removeComments",
+    "tsc": "tsc --outDir dist --declaration --sourceMap --removeComments",
     "lint": "eslint .",
     "prepare": "npm run build"
   },
