@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/utils/levenshteinDistance.ts</title>
+    <title>Code coverage report for src/validators/inputValidator.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/utils</a> levenshteinDistance.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/validators</a> inputValidator.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>20/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -81,43 +81,76 @@
 <a name='L16'></a><a href='#L16'>16</a>
 <a name='L17'></a><a href='#L17'>17</a>
 <a name='L18'></a><a href='#L18'>18</a>
-<a name='L19'></a><a href='#L19'>19</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">72x</span>
-<span class="cline-any cline-yes">4388x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">72x</span>
-<span class="cline-any cline-yes">470x</span>
-<span class="cline-any cline-yes">3375x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">72x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// src\utils\levenshteinDistance.ts
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// src\validators\inputValidator.ts
 &nbsp;
+import { ValidationOptions } from '../types';
 &nbsp;
-export default function levenshteinDistance(a: string, b: string): number {
-  const matrix: number[][] = Array.from({ length: a.length + 1 }, (_, i) =&gt;
-    Array.from({ length: b.length + 1 }, (_, j) =&gt; (i === 0 ? j : j === 0 ? i : 0))
-  );
+export function validateInput(password: string, options: ValidationOptions): string[] {
+  const errors: string[] = [];
 &nbsp;
-  for (let i = 1; i &lt;= a.length; i++) {
-    for (let j = 1; j &lt;= b.length; j++) {
-      matrix[i][j] =
-        a[i - 1] === b[j - 1]
-          ? matrix[i - 1][j - 1]  
-          : Math.min(matrix[i - 1][j], matrix[i][j - 1], matrix[i - 1][j - 1]) + 1;
-    }
+  // Input validation
+  if (typeof password !== 'string' || password.trim() === '') {
+    errors.push('Password cannot be empty.');
   }
-  return matrix[a.length][b.length];
-}
-&nbsp;</pre></td></tr></table></pre>
+&nbsp;
+  if (options.minLength &amp;&amp; typeof options.minLength !== 'number') {
+    errors.push('Minimum length must be a number.');
+  }
+&nbsp;
+  if (options.maxLength &amp;&amp; typeof options.maxLength !== 'number') {
+    errors.push('Maximum length must be a number.');
+  }
+&nbsp;
+  if (options.blacklist &amp;&amp; !Array.isArray(options.blacklist)) {
+    errors.push('Blacklist must be an array.');
+  }
+&nbsp;
+  if (options.fuzzyToleranceValue &amp;&amp; typeof options.fuzzyToleranceValue !== 'number') {
+    errors.push('Fuzzy tolerance must be a number.');
+  }
+&nbsp;
+  return errors;
+} </pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->

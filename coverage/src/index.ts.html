@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">84.61% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>11/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -102,7 +102,12 @@
 <a name='L37'></a><a href='#L37'>37</a>
 <a name='L38'></a><a href='#L38'>38</a>
 <a name='L39'></a><a href='#L39'>39</a>
-<a name='L40'></a><a href='#L40'>40</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -112,73 +117,83 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// src\index.ts
 import { lengthValidator } from './validators/lengthValidator';
 import { blacklistValidator } from './validators/blacklistValidator';
 import { hibpValidator } from './validators/hibpValidator';
+import { validateInput } from './validators/inputValidator';
 import { ValidationOptions, ValidationResult } from './types';
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >validatePassword(</span>
+export default async function validatePassword(
   password: string,
-  options: ValidationOptions = <span class="branch-0 cbranch-no" title="branch not covered" >{}</span>
+  options: ValidationOptions = {}
 ): Promise&lt;ValidationResult&gt; {
-  const errors: string[] = <span class="cstat-no" title="statement not covered" >[];</span>
+  const errors: string[] = validateInput(password, options);
+&nbsp;
+  if (errors.length &gt; 0) {
+    return { isValid: false, errors };
+  }
 &nbsp;
   // Length validation
-  const lengthResult = <span class="cstat-no" title="statement not covered" >lengthValidator(password, options.minLength, options.maxLength);</span>
-<span class="cstat-no" title="statement not covered" >  errors.push(...lengthResult.errors);</span>
+  const lengthResult = lengthValidator(password, options.minLength, options.maxLength);
+  errors.push(...lengthResult.errors);
 &nbsp;
   // Check for maximum length error
-<span class="cstat-no" title="statement not covered" >  if (options.maxLength &amp;&amp; password.length &gt; options.maxLength) {</span>
-<span class="cstat-no" title="statement not covered" >    errors.push(`Password must be at most ${options.maxLength} characters.`);</span>
+  if (options.maxLength &amp;&amp; password.length &gt; options.maxLength) {
+    errors.push(`Password must be at most ${options.maxLength} characters.`);
   }
 &nbsp;
   // Blacklist validation
-<span class="cstat-no" title="statement not covered" >  if (options.blacklist) {</span>
-    const blacklistResult = <span class="cstat-no" title="statement not covered" >blacklistValidator(</span>
+  if (options.blacklist) {
+    const blacklistResult = blacklistValidator(
       password,
       options.blacklist,
-      options.fuzzyTolerance || 3
+      options.fuzzyToleranceValue || <span class="branch-1 cbranch-no" title="branch not covered" >3</span>
     );
-<span class="cstat-no" title="statement not covered" >    errors.push(...blacklistResult.errors);</span>
+    errors.push(...blacklistResult.errors);
   }
 &nbsp;
   // HIBP validation
-<span class="cstat-no" title="statement not covered" >  if (options.hibpCheck !== false) {</span>
-    const hibpResult = <span class="cstat-no" title="statement not covered" >await hibpValidator(password);</span>
-<span class="cstat-no" title="statement not covered" >    errors.push(...hibpResult.errors);</span>
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (options.hibpCheck !== false) {
+    const hibpResult = await hibpValidator(password);
+    errors.push(...hibpResult.errors);
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return { isValid: errors.length === 0, errors };</span>
+  return { isValid: errors.length === 0, errors };
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -187,7 +202,7 @@ export async function <span class="fstat-no" title="function not covered" >valid
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-12-09T10:15:55.251Z
+                at 2024-12-10T08:44:20.237Z
             </div>
         <script src="../prettify.js"></script>
         <script>

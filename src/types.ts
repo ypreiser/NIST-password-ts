@@ -11,7 +11,7 @@ export type ValidationOptions = {
   maxLength?: number;
   allowedCharacterSet?: RegExp;
   blacklist?: string[];
-  fuzzyTolerance?: fuzzyTolerancevalue;
+  fuzzyToleranceValue?: fuzzyTolerancevalue;
   hibpCheck?: boolean;
 };
 

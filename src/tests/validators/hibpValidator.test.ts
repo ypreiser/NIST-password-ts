@@ -33,7 +33,6 @@ describe('hibpValidator', () => {
   it('returns error for password in the HIBP database', async () => {
     // Generate SHA-1 for "password"
     const sha1 = await generateSHA1('password');
-    const prefix = sha1.substring(0, 5); // First 5 characters
     const suffix = sha1.substring(5);    // Remaining characters
 
     // Mock fetch to return a response containing the matching suffix

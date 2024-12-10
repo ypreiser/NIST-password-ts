@@ -1,11 +1,11 @@
 // src\validators\blacklistValidator.ts
-import { ValidationResult, fuzzyTolerancevalue } from '../types';
-import levenshteinDistance from '../utils/levenshteinDistance';
+import { ValidationResult } from "../types";
+import levenshteinDistance from "../utils/levenshteinDistance";
 
 export function blacklistValidator(
   password: string,
   blacklist: string[] | null | undefined,
-  fuzzyTolerance : fuzzyTolerancevalue = 3 
+  fuzzyToleranceValue: number = 3
 ): ValidationResult {
   const errors: string[] = [];
 
@@ -16,8 +16,11 @@ export function blacklistValidator(
   const isBlacklisted = blacklist.some((blacklistedWord) => {
     for (let i = 0; i <= password.length - blacklistedWord.length; i++) {
       const substring = password.substring(i, i + blacklistedWord.length);
-      const distance = levenshteinDistance(substring.toLowerCase(), blacklistedWord.toLowerCase());
-      if (distance <= fuzzyTolerance) {
+      const distance = levenshteinDistance(
+        substring.toLowerCase(),
+        blacklistedWord.toLowerCase()
+      );
+      if (distance <= fuzzyToleranceValue) {
         return true;
       }
     }
@@ -25,7 +28,9 @@ export function blacklistValidator(
   });
 
   if (isBlacklisted) {
-    errors.push('Password contains a substring too similar to a blacklisted term.');
+    errors.push(
+      "Password contains a substring too similar to a blacklisted term."
+    );
   }
 
   return { isValid: errors.length === 0, errors };
