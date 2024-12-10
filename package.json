@@ -1,19 +1,31 @@
 {
   "name": "secure-pw-validator",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js"
   },
   "scripts": {
     "test": "vitest --coverage --ui",
     "build": "tsc --outDir dist --declaration --sourceMap --removeComments",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prepare": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "password",
+    "validation",
+    "security",
+    "NIST",
+    "npm"
+  ],
+  "author": "Yehoshua Preiser",
+  "license": "MIT",
+  "description": "A lightweight password validator that complies with NIST guidelines.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ypreiser/NIST-password-ts.git"
+  },
   "devDependencies": {
     "@eslint/js": "^9.16.0",
     "@types/node": "^22.10.1",
@@ -25,6 +37,7 @@
     "eslint-define-config": "^2.1.0",
     "globals": "^15.13.0",
     "typescript": "^5.7.2",
+    "vite": "^5.4.11",
     "vitest": "^2.1.8"
   }
 }
