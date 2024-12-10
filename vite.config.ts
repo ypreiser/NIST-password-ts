@@ -6,8 +6,6 @@ export default defineConfig({
     include: [
       "src/tests/**/*.test.ts",
       "src/tests/**/*.spec.ts",
-      "dist/tests/**/*.test.js",
-      "dist/tests/**/*.spec.js"
     ],
     coverage: {
       provider: "istanbul",

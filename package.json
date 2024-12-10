@@ -6,7 +6,7 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "test": "vitest --coverage --ui --include dist/**/*.test.js",
+    "test": "vitest --coverage --ui",
     "build": "tsc --outDir dist --declaration --sourceMap --removeComments",
     "lint": "eslint ."
   },
