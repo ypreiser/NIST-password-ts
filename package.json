@@ -2,15 +2,13 @@
   "name": "secure-pw-validator",
   "version": "1.0.0",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": "./dist/index.js"
-  },
+  "types": "dist/types.js",
+  "module": "dist/index.js",
   "scripts": {
-    "build": "vite build",
+    "vite-build": "vite build",
     "dev": "vite",
     "test": "vitest --coverage --ui",
-    "tsc": "tsc --outDir dist --declaration --sourceMap --removeComments",
+    "build": "tsup src",
     "lint": "eslint .",
     "prepare": "npm run build"
   },
@@ -38,6 +36,7 @@
     "eslint": "^9.16.0",
     "eslint-define-config": "^2.1.0",
     "globals": "^15.13.0",
+    "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
     "vitest": "^2.1.8"

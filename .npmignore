@@ -1,0 +1,31 @@
+# Source files
+src/
+tests/
+
+# Configuration files
+.eslintrc.js
+.eslintrc.json
+vite.config.ts
+tsconfig.json
+vitest.config.ts
+
+# Development files
+coverage/
+.vscode/
+.idea/
+.git/
+.gitignore
+.github/
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+
+# Misc
+*.log
+.DS_Store
+.env
+.env.*
+
+# Build process files
+node_modules/ 

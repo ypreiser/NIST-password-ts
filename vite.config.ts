@@ -3,7 +3,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   build: {
-    outDir: 'dist', // Output folder for built files
+    outDir: 'dist',
   },
   test: {
     include: [
