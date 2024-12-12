@@ -1,5 +1,5 @@
 {
-  "name": "secure-pw-validator",
+  "name": "nist-password-validator.ts",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/types.js",

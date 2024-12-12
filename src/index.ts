@@ -5,7 +5,7 @@ import { hibpValidator } from './validators/hibpValidator';
 import { validateInput } from './validators/inputValidator';
 import { ValidationOptions, ValidationResult } from './types';
 
-export default async function validatePassword(
+async function validatePassword(
   password: string,
   options: ValidationOptions = {}
 ): Promise<ValidationResult> {
@@ -42,3 +42,4 @@ export default async function validatePassword(
 
   return { isValid: errors.length === 0, errors };
 }
+export { validatePassword, lengthValidator, blacklistValidator, hibpValidator };

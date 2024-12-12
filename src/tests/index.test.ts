@@ -1,6 +1,6 @@
 // src\tests\index.test.ts
 import { describe, it, expect } from "vitest";
-import validatePassword from "../index";
+import { validatePassword } from "../index";
 
 describe("Password Validation", () => {
   it("should return an error for empty password", async () => {
