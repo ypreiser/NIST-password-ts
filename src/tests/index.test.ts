@@ -25,12 +25,12 @@ describe("Password Validation", () => {
     expect(result.errors).toContain("Maximum length must be a number.");
   });
 
-  it("should return an error for invalid blacklist", async () => {
+  it("should return an error for invalid blocklist", async () => {
     const result = await validatePassword("validPassword", {
-      blacklist: "notAnArray" as any,
+      blocklist: "notAnArray" as any,
     });
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain("Blacklist must be an array.");
+    expect(result.errors).toContain("Blocklist must be an array.");
   });
 
   it("should return an error for invalid fuzzyToleranceValue", async () => {
@@ -45,7 +45,7 @@ describe("Password Validation", () => {
     const result = await validatePassword("validPassword123", {
       minLength: 8,
       maxLength: 64,
-      blacklist: [],
+      blocklist: [],
       fuzzyToleranceValue: 3,
     });
     expect(result.isValid).toBe(true);

@@ -18,8 +18,8 @@ export function validateInput(password: string, options: ValidationOptions): str
     errors.push('Maximum length must be a number.');
   }
 
-  if (options.blacklist && !Array.isArray(options.blacklist)) {
-    errors.push('Blacklist must be an array.');
+  if (options.blocklist && !Array.isArray(options.blocklist)) {
+    errors.push('Blocklist must be an array.');
   }
 
   if (options.fuzzyToleranceValue && typeof options.fuzzyToleranceValue !== 'number') {

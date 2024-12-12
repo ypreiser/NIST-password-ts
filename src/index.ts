@@ -1,9 +1,9 @@
 // src\index.ts
-import { lengthValidator } from './validators/lengthValidator';
-import { blacklistValidator } from './validators/blacklistValidator';
-import { hibpValidator } from './validators/hibpValidator';
-import { validateInput } from './validators/inputValidator';
-import { ValidationOptions, ValidationResult } from './types';
+import { lengthValidator } from "./validators/lengthValidator";
+import { blocklistValidator } from "./validators/blocklistValidator";
+import { hibpValidator } from "./validators/hibpValidator";
+import { validateInput } from "./validators/inputValidator";
+import { ValidationOptions, ValidationResult } from "./types";
 
 async function validatePassword(
   password: string,
@@ -16,7 +16,11 @@ async function validatePassword(
   }
 
   // Length validation
-  const lengthResult = lengthValidator(password, options.minLength, options.maxLength);
+  const lengthResult = lengthValidator(
+    password,
+    options.minLength,
+    options.maxLength
+  );
   errors.push(...lengthResult.errors);
 
   // Check for maximum length error
@@ -24,14 +28,14 @@ async function validatePassword(
     errors.push(`Password must be at most ${options.maxLength} characters.`);
   }
 
-  // Blacklist validation
-  if (options.blacklist) {
-    const blacklistResult = blacklistValidator(
+  // Blocklist validation
+  if (options.blocklist) {
+    const blocklistResult = blocklistValidator(
       password,
-      options.blacklist,
+      options.blocklist,
       options.fuzzyToleranceValue || 3
     );
-    errors.push(...blacklistResult.errors);
+    errors.push(...blocklistResult.errors);
   }
 
   // HIBP validation
@@ -42,4 +46,4 @@ async function validatePassword(
 
   return { isValid: errors.length === 0, errors };
 }
-export { validatePassword, lengthValidator, blacklistValidator, hibpValidator };
+export { validatePassword, lengthValidator, blocklistValidator, hibpValidator };

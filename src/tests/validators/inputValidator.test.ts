@@ -28,10 +28,10 @@ describe("Input Validator", () => {
     expect(result).toEqual(["Maximum length must be a number."]);
   });
 
-  it("should return an error if blacklist is not an array", () => {
-    const options: ValidationOptions = { blacklist: "notAnArray" as any };
+  it("should return an error if blocklist is not an array", () => {
+    const options: ValidationOptions = { blocklist: "notAnArray" as any };
     const result = validateInput("validPassword", options);
-    expect(result).toEqual(["Blacklist must be an array."]);
+    expect(result).toEqual(["Blocklist must be an array."]);
   });
 
   it("should return an error if fuzzyToleranceValue is not a number", () => {
@@ -44,7 +44,7 @@ describe("Input Validator", () => {
     const options: ValidationOptions = {
       minLength: 8,
       maxLength: 64,
-      blacklist: [],
+      blocklist: [],
       fuzzyToleranceValue: 3,
     };
     const result = validateInput("validPassword", options);

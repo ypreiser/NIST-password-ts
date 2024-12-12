@@ -1,16 +1,10 @@
 // src\types.ts
-export type CharacterTypeOptions = {
-  requireUppercase: boolean;
-  requireLowercase: boolean;
-  requireDigits: boolean;
-  requireSpecialCharacters: boolean;
-};
 
 export type ValidationOptions = {
   minLength?: number;
   maxLength?: number;
   allowedCharacterSet?: RegExp;
-  blacklist?: string[];
+  blocklist?: string[];
   fuzzyToleranceValue?: fuzzyTolerancevalue;
   hibpCheck?: boolean;
 };

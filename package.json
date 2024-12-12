@@ -1,5 +1,5 @@
 {
-  "name": "nist-password-validator.ts",
+  "name": "nist-password-validator",
   "version": "1.0.1",
   "main": "dist/index.js",
   "types": "dist/types.js",

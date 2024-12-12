@@ -15,7 +15,7 @@ Passwords are often the weakest link in securing digital systems. To mitigate th
 3. **No Character Composition Rules**: Avoid enforcing arbitrary rules like requiring special characters or mixtures of uppercase/lowercase letters.
 4. **Unicode Support**: Accept all Unicode characters, ensuring inclusivity and usability.
 5. **Compromised Password Checks**: Block passwords that have appeared in previous data breaches.
-6. **Blacklist with Fuzzy Matching**: Disallow passwords similar to commonly used or compromised terms (e.g., "password", "admin").
+6. **Blocklist with Fuzzy Matching**: Disallow passwords similar to commonly used or compromised terms (e.g., "password", "admin").
 
 This library implements these principles to ensure secure and user-friendly password policies.
 
@@ -27,12 +27,12 @@ This library implements these principles to ensure secure and user-friendly pass
   - Minimum and maximum password length based on Unicode code points.
   - No arbitrary composition rules.
 - **HIBP Integration**: Checks passwords against the **Have I Been Pwned (HIBP)** database to block known compromised passwords.
-- **Blacklist with Fuzzy Matching**:
-  - Identifies passwords similar to blacklisted terms.
+- **Blocklist with Fuzzy Matching**:
+  - Identifies passwords similar to blocklisted terms.
   - Includes leetspeak transformations and fuzzy matching.
 - **Customizable Rules**:
   - Adjustable password length limits.
-  - Configurable blacklist and fuzzy tolerance.
+  - Configurable blocklist and fuzzy tolerance.
   - Toggle HIBP checks.
 
 ---
@@ -78,7 +78,7 @@ async function checkCustomPassword() {
     minLength: 10, // Custom minimum length (default : 15)
     maxLength: 50, // Custom maximum length(default : 64)
     hibpCheck: true, // Check against HIBP (default: true)
-    blacklist: ["password"], // Custom blacklist
+    blocklist: ["password"], // Custom blocklist
     fuzzyTolerance: 2, // Custom fuzzy tolerance (default: 3)
   });
 
@@ -108,14 +108,14 @@ checkCustomPassword();
    console.log(result);
    ```
 
-2. **Blacklist Validation**:
+2. **Blocklist Validation**:
 
-   - Detects passwords similar to blacklisted terms, including leetspeak and fuzzy matching.
+   - Detects passwords similar to blocklisted terms, including leetspeak and fuzzy matching.
 
    ```typescript
-   import { blacklistValidator } from "nist-password-validator.ts";
+   import { blocklistValidator } from "nist-password-validator.ts";
 
-   const result = blacklistValidator("myp@ssw0rd!", ["password"], 3);
+   const result = blocklistValidator("myp@ssw0rd!", ["password"], 3);
    console.log(result);
    ```
 
@@ -139,8 +139,8 @@ checkCustomPassword();
 2. **Hashing Before Sending to HIBP**:
    The HIBP validator hashes passwords using SHA-1 before sending the prefix of the hash to the API, ensuring no plaintext passwords are transmitted.
 
-3. **Blacklist for Organizational Security**:
-   Use the blacklist feature to prevent users from setting passwords similar to commonly used terms or organizationally sensitive words (e.g., "admin").
+3. **Blocklist for Organizational Security**:
+   Use the blocklist feature to prevent users from setting passwords similar to commonly used terms or organizationally sensitive words (e.g., "admin").
 
 4. **Testing Fuzzy Matching**:
    Validate fuzzy matching rules to ensure they appropriately block passwords with minor variations.
