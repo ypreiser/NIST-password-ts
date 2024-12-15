@@ -2,6 +2,12 @@
 
 import { ValidationOptions } from '../types';
 
+/**
+ * Validates the input password against various criteria.
+ * @param {string} password - The password to validate.
+ * @param {ValidationOptions} options - The validation options including minLength, maxLength, blocklist, and fuzzyToleranceValue.
+ * @returns {string[]} - An array of error messages if validation fails, or an empty array if validation passes.
+ */
 export function validateInput(password: string, options: ValidationOptions): string[] {
   const errors: string[] = [];
 

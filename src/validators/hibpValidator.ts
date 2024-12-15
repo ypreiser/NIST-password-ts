@@ -2,6 +2,7 @@
 
 import { ValidationResult } from "../types";
 const API_URL = "https://api.pwnedpasswords.com/range/";
+
 /**
  * Checks if the given password has been exposed in a data breach.
  * @param {string} password - The password to check.
@@ -42,8 +43,7 @@ export async function hibpValidator(
  * @param {string} password - The password to hash.
  * @returns {Promise<string>} - The SHA-1 hash of the password.
  */
-
-async function generateSHA1(password: string) {
+async function generateSHA1(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
   const hashBuffer = await crypto.subtle.digest("SHA-1", data);

@@ -2,6 +2,13 @@
 import { getUtf8Length } from '../utils/utf8Length';
 import { ValidationResult } from '../types';
 
+/**
+ * Validates the length of a password against specified minimum and maximum lengths.
+ * @param {string} password - The password to validate.
+ * @param {number} [min=15] - The minimum length the password must meet.
+ * @param {number} [max=64] - The maximum length the password must not exceed.
+ * @returns {ValidationResult} - An object containing a boolean indicating validity and an array of error messages.
+ */
 export function lengthValidator(
   password: string,
   min: number = 15,

@@ -5,6 +5,12 @@ import { hibpValidator } from "./validators/hibpValidator";
 import { validateInput } from "./validators/inputValidator";
 import { ValidationOptions, ValidationResult } from "./types";
 
+/**
+ * Validates a password against various criteria including length, blocklist, and breach checks.
+ * @param {string} password - The password to validate.
+ * @param {ValidationOptions} [options={}] - The validation options including minLength, maxLength, blocklist, fuzzyToleranceValue, and hibpCheck.
+ * @returns {Promise<ValidationResult>} - A promise that resolves to an object containing a boolean indicating validity and an array of error messages.
+ */
 async function validatePassword(
   password: string,
   options: ValidationOptions = {}

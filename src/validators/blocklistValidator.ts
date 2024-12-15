@@ -2,6 +2,13 @@
 import { ValidationResult } from "../types";
 import levenshteinDistance from "../utils/levenshteinDistance";
 
+/**
+ * Validates a password against a blocklist, allowing for fuzzy matching.
+ * @param {string} password - The password to validate.
+ * @param {string[] | null | undefined} blocklist - The list of blocked terms.
+ * @param {number} [fuzzyToleranceValue=3] - The maximum allowed distance for fuzzy matching.
+ * @returns {ValidationResult} - The result of the validation, including whether the password is valid and any errors.
+ */
 export function blocklistValidator(
   password: string,
   blocklist: string[] | null | undefined,
