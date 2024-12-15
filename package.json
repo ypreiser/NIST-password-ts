@@ -17,11 +17,19 @@
     "validation",
     "security",
     "NIST",
-    "npm"
+    "npm",
+    "authentication",
+    "password-strength",
+    "compliance",
+    "hashing",
+    "encryption",
+    "user-security",
+    "password-policy",
+    "nist-800-63b"
   ],
   "author": "Yehoshua Preiser",
   "license": "MIT",
-  "description": "A lightweight password validator that complies with NIST guidelines.",
+  "description": "A lightweight, zero-dependencies open-source password validator according to NIST guidelines.",
   "repository": {
     "type": "git",
     "url": "https://github.com/ypreiser/NIST-password-ts.git"

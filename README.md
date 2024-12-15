@@ -1,5 +1,7 @@
 ## **NIST Password Validator Library**
 
+A lightweight, zero-dependencies open-source password validator according to NIST guidelines.
+
 ### **Introduction**
 
 This library provides a robust password validation solution based on the [NIST Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-4/sp800-63b.html) for password security. It is designed to be secure, easy to use, and customizable, adhering to modern password validation practices, including checking against known data breaches and implementing Unicode-compliant password length validation.
