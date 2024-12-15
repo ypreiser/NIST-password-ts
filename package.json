@@ -25,7 +25,11 @@
     "encryption",
     "user-security",
     "password-policy",
-    "nist-800-63b"
+    "nist-800-63b",
+    "cyber",
+    "cybersecurity",
+    "cyber-security",
+    "cyber-security-policy"    
   ],
   "author": "Yehoshua Preiser",
   "license": "MIT",
