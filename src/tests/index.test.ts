@@ -103,4 +103,24 @@ describe("Password Validation", () => {
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain("Password must be at least 8 characters.");
   });
+
+  it("should not check HIBP for compromised passwords when hibpCheck is false", async () => {
+    const result = await validatePassword("password", {
+      minLength: 8,
+      hibpCheck: false,
+    });
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
+
+  it("should use default fuzzyToleranceValue of 3 when fuzzyToleranceValue is null", async () => {
+    const result = await validatePassword("validPassword", {
+      minLength: 8,
+      hibpCheck: false,
+      blocklist: ["not-validPassword"],
+    });
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
+
+  });
 });

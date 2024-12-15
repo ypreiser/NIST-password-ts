@@ -13,7 +13,7 @@ describe("blocklistValidator", () => {
     expect(result).toEqual({
       isValid: false,
       errors: [
-        "Password contains a substring too similar to a blocklisted term.",
+        "Password contains a substring too similar to a blocked term.",
       ],
     });
   });
@@ -23,12 +23,12 @@ describe("blocklistValidator", () => {
     expect(result).toEqual({ isValid: true, errors: [] });
   });
 
-  it("returns error for a close fuzzy match to a blocklisted password", () => {
+  it("returns error for a close fuzzy match to a blocked password", () => {
     const result = blocklistValidator("passw0rd", ["password"], 2); // Allow a small fuzziness
     expect(result).toEqual({
       isValid: false,
       errors: [
-        "Password contains a substring too similar to a blocklisted term.",
+        "Password contains a substring too similar to a blocked term.",
       ],
     });
   });
@@ -53,7 +53,7 @@ describe("blocklistValidator", () => {
     expect(result).toEqual({
       isValid: false,
       errors: [
-        "Password contains a substring too similar to a blocklisted term.",
+        "Password contains a substring too similar to a blocked term.",
       ],
     });
   });
@@ -77,7 +77,7 @@ describe("blocklistValidator", () => {
     expect(result).toEqual({
       isValid: false,
       errors: [
-        "Password contains a substring too similar to a blocklisted term.",
+        "Password contains a substring too similar to a blocked term.",
       ],
     });
   });
@@ -97,22 +97,22 @@ describe("blocklistValidator", () => {
     expect(result).toEqual({ isValid: true, errors: [] });
   });
 
-  it("handles passwords containing multiple substrings of blocklisted terms", () => {
+  it("handles passwords containing multiple substrings of blocked terms", () => {
     const result = blocklistValidator("mypassword123", ["password", "123"]);
     expect(result).toEqual({
       isValid: false,
       errors: [
-        "Password contains a substring too similar to a blocklisted term.",
+        "Password contains a substring too similar to a blocked term.",
       ],
     });
   });
 
-  it("handles passwords that partially overlap multiple blocklisted terms", () => {
+  it("handles passwords that partially overlap multiple blocked terms", () => {
     const result = blocklistValidator("pass123word", ["password", "123"]);
     expect(result).toEqual({
       isValid: false,
       errors: [
-        "Password contains a substring too similar to a blocklisted term.",
+        "Password contains a substring too similar to a blocked term.",
       ],
     });
   });
