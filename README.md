@@ -13,7 +13,7 @@ This library provides a robust password validation solution based on the [NIST D
 Passwords are often the weakest link in securing digital systems. To mitigate this, the National Institute of Standards and Technology (NIST) released updated recommendations for password policies. These include:
 
 1. **Minimum Length**: Passwords should be at least **15 characters** to enhance resistance against brute-force attacks.
-2. **Maximum Length**: Verifiers must support passwords up to **64 characters**.
+2. **Maximum Length**: Verifiers must support passwords up to **64 characters**. Extremely long passwords (perhaps megabytes long) could require excessive processing time to hash, so it is reasonable to have some limit
 3. **No Character Composition Rules**: Avoid enforcing arbitrary rules like requiring special characters or mixtures of uppercase/lowercase letters.
 4. **Unicode Support**: Accept all Unicode characters, ensuring inclusivity and usability.
 5. **Compromised Password Checks**: Block passwords that have appeared in previous data breaches.
@@ -78,10 +78,10 @@ import { validatePassword } from "@yourorg/password-validator";
 async function checkCustomPassword() {
   const result = await validatePassword("myp@ssw0rd!", {
     minLength: 10, // Custom minimum length (default : 15)
-    maxLength: 50, // Custom maximum length(default : 64)
+    maxLength: 500000, // Custom maximum length(default : 100K)
     hibpCheck: true, // Check against HIBP (default: true)
     blocklist: ["password"], // Custom blocklist
-    fuzzyTolerance: 2, // Custom fuzzy tolerance (default: 3)
+    fuzzyToleranceValue: 2, // Custom fuzzy tolerance (default: 3)
   });
 
   if (!result.isValid) {
