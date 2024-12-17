@@ -51,6 +51,19 @@ npm install nist-password-validator.ts
 
 ### **Usage**
 
+To ensure a seamless integration of the NIST Password Validator Library in both front-end and back-end applications, it is crucial to install the library in both environments. This allows for consistent password validation rules across your entire application, enhancing security and user experience.
+
+#### **Installation**
+
+Install the library using npm:
+
+```bash
+npm install nist-password-validator
+```
+
+By installing the library in both environments, you ensure that password validation is handled uniformly, reducing the risk of discrepancies and potential security vulnerabilities.
+
+
 Here’s how to validate a password with the library:
 
 #### **Basic Example**
