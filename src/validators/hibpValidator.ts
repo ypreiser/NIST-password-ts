@@ -16,14 +16,28 @@ export async function hibpValidator(
     const prefix = sha1.substring(0, 5);
     const suffix = sha1.substring(5);
 
-    const response = await fetch(`${API_URL}${prefix}`);
+    const response = await fetch(`${API_URL}${prefix}`, {
+      method: "GET",
+      headers: {
+        "User-Agent": "NIST-password-validator-ts",
+        "Add-Padding": "true",
+      },
+    });
     if (!response.ok) {
       const errorDetails = await response.text();
-      throw new Error(`Failed to check password against HaveIBeenPwned API. Status: ${response.status}, Details: ${errorDetails}`);
+      throw new Error(
+        `Failed to check password against HaveIBeenPwned API. Status: ${response.status}, Details: ${errorDetails}`
+      );
     }
-  
+
     const text = await response.text();
-    const found = text.includes(suffix);
+    const lines = text.split("\n");
+
+    // Filter and check if the suffix is present with a count > 0
+    const found = lines.some((line) => {
+      const [hashSuffix, count] = line.split(":");
+      return hashSuffix.trim() === suffix && parseInt(count.trim(), 10) > 0;
+    });
 
     return found
       ? {
