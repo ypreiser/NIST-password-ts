@@ -1,6 +1,6 @@
 {
   "name": "nist-password-validator",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "dist/index.js",
   "types": "dist/types.js",
   "module": "dist/index.js",
@@ -55,8 +55,5 @@
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
     "vitest": "^2.1.8"
-  },
-  "dependencies": {
-    "node": "^23.4.0"
   }
 }
