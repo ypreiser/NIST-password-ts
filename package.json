@@ -7,7 +7,7 @@
   "scripts": {
     "vite-build": "vite build",
     "dev": "vite",
-    "test": "vitest --coverage --ui",
+    "test": "vitest --coverage",
     "build": "tsup src",
     "lint": "eslint .",
     "prepare": "npm run build"

@@ -22,7 +22,9 @@ describe("blocklistValidator", () => {
   });
 
   it("validates a password when fuzzy matching is disabled", () => {
-    const result = blocklistValidator("passw0rd", ["password"], { maxTolerance: 0 });
+    const result = blocklistValidator("passw0rd", ["password"], {
+      maxEditDistance: 0,
+    });
     expect(result).toEqual({ isValid: true, errors: [] });
   });
 
@@ -49,7 +51,7 @@ describe("blocklistValidator", () => {
 
   it("uses a custom tolerance calculator", () => {
     const result = blocklistValidator("mypassword", ["password"], {
-      customToleranceCalculator: (term) => Math.floor(term.length / 4),
+      customDistanceCalculator: (term) => Math.floor(term.length / 4),
     });
     expect(result).toEqual({
       isValid: false,

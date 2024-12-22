@@ -12,6 +12,7 @@ export type ValidationOptions = {
   maxEditDistance?: number; // Maximum allowed tolerance for fuzzy matching
   hibpCheck?: boolean; // Flag to enable or disable HIBP breach checks
   customDistanceCalculator?: (term: string, password: string) => number; // Custom function for tolerance calculation
+  trimWhitespace?: boolean; // Flag to enable or disable trimming of whitespace from password and blocklist terms
 };
 
 /**

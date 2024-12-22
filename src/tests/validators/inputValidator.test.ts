@@ -12,8 +12,8 @@ describe("Input Validator", () => {
 
   it("should return an error if the password is not a string", () => {
     const options: ValidationOptions = {};
-    const result = validateInput(null as any, options);
-    expect(result).toEqual(["Password cannot be empty."]);
+    const result = validateInput(1 as any, options);
+    expect(result).toEqual(["Password must be a string."]);
   });
 
   it("should return an error if minLength is not a number", () => {
@@ -34,22 +34,22 @@ describe("Input Validator", () => {
     expect(result).toEqual(["Blocklist must be an array."]);
   });
 
-  it("should return an error if fuzzyScalingFactor is not a number", () => {
+  it("should return an error if matchingSensitivity is not a number", () => {
     const options: ValidationOptions = { matchingSensitivity: "0.5" as any };
     const result = validateInput("validPassword", options);
-    expect(result).toEqual(["Fuzzy scaling factor must be a number."]);
+    expect(result).toEqual(["Matching sensitivity must be a number."]);
   });
 
-  it("should return an error if fuzzyScalingFactor is out of range", () => {
+  it("should return an error if matchingSensitivity is out of range", () => {
     const options: ValidationOptions = { matchingSensitivity: -0.1 };
     const result = validateInput("validPassword", options);
-    expect(result).toEqual(["Fuzzy scaling factor must be between 0 and 1."]);
+    expect(result).toEqual(["Matching sensitivity must be between 0 and 1."]);
   });
 
-  it("should return an error if fuzzyScalingFactor is greater than 1", () => {
+  it("should return an error if matchingSensitivity is greater than 1", () => {
     const options: ValidationOptions = { matchingSensitivity: 1.5 };
     const result = validateInput("validPassword", options);
-    expect(result).toEqual(["Fuzzy scaling factor must be between 0 and 1."]);
+    expect(result).toEqual(["Matching sensitivity must be between 0 and 1."]);
   });
 
   it("should return an error if minTolerance is not a number", () => {

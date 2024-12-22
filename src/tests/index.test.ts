@@ -33,12 +33,12 @@ describe("Password Validation", () => {
     expect(result.errors).toContain("Blocklist must be an array.");
   });
 
-  it("should return an error for invalid fuzzyScalingFactor", async () => {
+  it("should return an error for invalid matchingSensitivity", async () => {
     const result = await validatePassword("validPassword", {
       matchingSensitivity: "0.25" as any,
     });
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain("Fuzzy scaling factor must be a number.");
+    expect(result.errors).toContain("Matching sensitivity must be a number.");
   });
 
   it("should validate a valid password", async () => {
@@ -164,5 +164,45 @@ describe("Password Validation", () => {
     expect(result.errors).toContain(
       "Password contains a substring too similar to a blocked term."
     );
+  });
+
+  it("should trim whitespace from the password", async () => {
+    const result = await validatePassword("   validPassword123   ", {
+      trimWhitespace: true,
+      hibpCheck: false,
+    });
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
+
+  it("should not trim whitespace from the password if trimWhitespace is false", async () => {
+    const result = await validatePassword("   validPassword123   ", {
+      trimWhitespace: false,
+      hibpCheck: false,
+    });
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
+
+  it("should trim whitespace from blocklist terms", async () => {
+    const result = await validatePassword("mypassword", {
+      blocklist: ["   password   "],
+      trimWhitespace: true,
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain(
+      "Password contains a substring too similar to a blocked term."
+    );
+  });
+
+  it("should not trim whitespace from blocklist terms if trimWhitespace is false", async () => {
+    const result = await validatePassword("mypassword", {
+      blocklist: ["   password   "],
+      trimWhitespace: false,
+      hibpCheck: false,
+      minLength: 8,
+    });
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
   });
 });

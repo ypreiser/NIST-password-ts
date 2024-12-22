@@ -3,31 +3,31 @@ import levenshteinDistance from "../utils/levenshteinDistance";
 
 /**
  * Validates a password against a blocklist, allowing for fuzzy matching.
- * 
+ *
  * @param {string} password - The password to validate.
  * @param {string[] | null | undefined} blocklist - The list of blocked terms.
  * @param {object} [options] - Optional configuration for the validation process.
- * @param {number} [options.fuzzyScalingFactor=0.25] - Scaling factor for dynamic fuzzy tolerance.
- * @param {number} [options.minTolerance=0] - Minimum allowed fuzzy tolerance.
- * @param {number} [options.maxTolerance=5] - Maximum allowed fuzzy tolerance.
- * @param {function} [options.customToleranceCalculator] - Custom function for calculating tolerance.
+ * @param {number} [options.matchingSensitivity=0.25] - Scaling factor for dynamic matching sensitivity.
+ * @param {number} [options.minEditDistance=0] - Minimum allowed edit distance.
+ * @param {number} [options.maxEditDistance=5] - Maximum allowed edit distance.
+ * @param {function} [options.customDistanceCalculator] - Custom function for calculating edit distance.
  * @returns {{ isValid: boolean, errors: string[] }} - Validation result, indicating validity and any errors.
  */
 export function blocklistValidator(
   password: string,
   blocklist: string[] | null | undefined,
   options: {
-    fuzzyScalingFactor?: number;
-    minTolerance?: number;
-    maxTolerance?: number;
-    customToleranceCalculator?: (term: string, password: string) => number;
+    matchingSensitivity?: number;
+    minEditDistance?: number;
+    maxEditDistance?: number;
+    customDistanceCalculator?: (term: string, password: string) => number;
   } = {}
 ): { isValid: boolean; errors: string[] } {
   const {
-    fuzzyScalingFactor = 0.25,
-    minTolerance = 0,
-    maxTolerance = 5,
-    customToleranceCalculator,
+    matchingSensitivity: matchingSensitivity = 0.25,
+    minEditDistance: minEditDistance = 0,
+    maxEditDistance: maxEditDistance = 5,
+    customDistanceCalculator: customDistanceCalculator,
   } = options;
 
   const errors: string[] = [];
@@ -37,14 +37,14 @@ export function blocklistValidator(
   }
 
   const isBlocked = blocklist.some((blockedWord) => {
-    const fuzzyTolerance = customToleranceCalculator
-      ? customToleranceCalculator(blockedWord, password)
+    const fuzzyTolerance = customDistanceCalculator
+      ? customDistanceCalculator(blockedWord, password)
       : Math.max(
           Math.min(
-            Math.floor(blockedWord.length * fuzzyScalingFactor),
-            maxTolerance
+            Math.floor(blockedWord.length * matchingSensitivity),
+            maxEditDistance
           ),
-          minTolerance
+          minEditDistance
         );
 
     for (let i = 0; i <= password.length - blockedWord.length; i++) {
