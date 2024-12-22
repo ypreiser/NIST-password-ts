@@ -1,44 +1,66 @@
 // src\validators\blocklistValidator.ts
-import { ValidationResult } from "../types";
 import levenshteinDistance from "../utils/levenshteinDistance";
 
 /**
  * Validates a password against a blocklist, allowing for fuzzy matching.
+ *
  * @param {string} password - The password to validate.
  * @param {string[] | null | undefined} blocklist - The list of blocked terms.
- * @param {number} [fuzzyToleranceValue=3] - The maximum allowed distance for fuzzy matching.
- * If the blocklist contains a term with the same length as this value, an error will be thrown.
- * @returns {ValidationResult} - The result of the validation, including whether the password is valid and any errors.
- * @throws {Error} - Throws an error if the blocklist contains a term with the same length as the fuzzy tolerance value.
+ * @param {object} [options] - Optional configuration for the validation process.
+ * @param {number} [options.matchingSensitivity=0.25] - Scaling factor for dynamic matching sensitivity.
+ * @param {number} [options.minEditDistance=0] - Minimum allowed edit distance.
+ * @param {number} [options.maxEditDistance=5] - Maximum allowed edit distance.
+ * @param {function} [options.customDistanceCalculator] - Custom function for calculating edit distance.
+ * @param {boolean} [options.trimWhitespace=true] - Flag to enable or disable trimming of whitespace from blocklist terms.
+ * @returns {{ isValid: boolean, errors: string[] }} - Validation result, indicating validity and any errors.
  */
 export function blocklistValidator(
   password: string,
   blocklist: string[] | null | undefined,
-  fuzzyToleranceValue: number = 2
-): ValidationResult {
+  options: {
+    matchingSensitivity?: number;
+    minEditDistance?: number;
+    maxEditDistance?: number;
+    customDistanceCalculator?: (term: string, password: string) => number;
+    trimWhitespace?: boolean;
+  } = {}
+): { isValid: boolean; errors: string[] } {
+  const {
+    matchingSensitivity = 0.25,
+    minEditDistance = 0,
+    maxEditDistance = 5,
+    customDistanceCalculator,
+    trimWhitespace = true,
+  } = options;
+
   const errors: string[] = [];
 
   if (!Array.isArray(blocklist) || blocklist.length === 0) {
     return { isValid: true, errors };
   }
 
-  // New check for blocklist entries with the same length as fuzzyToleranceValue + 1
-  if (
-    blocklist.some(
-      (blockedWord) => blockedWord.length === fuzzyToleranceValue + 1
-    )
-  ) {
-    throw new Error("Blocklist contains a term that is too short.");
-  }
+  const trimmedBlocklist = trimWhitespace
+    ? blocklist.map((term) => term.trim())
+    : blocklist;
 
-  const isBlocked = blocklist.some((blockedWord) => {
+  const isBlocked = trimmedBlocklist.some((blockedWord) => {
+    const fuzzyTolerance = customDistanceCalculator
+      ? customDistanceCalculator(blockedWord, password)
+      : Math.max(
+          Math.min(
+            Math.floor(blockedWord.length * matchingSensitivity),
+            maxEditDistance
+          ),
+          minEditDistance
+        );
+
     for (let i = 0; i <= password.length - blockedWord.length; i++) {
       const substring = password.substring(i, i + blockedWord.length);
       const distance = levenshteinDistance(
         substring.toLowerCase(),
         blockedWord.toLowerCase()
       );
-      if (distance <= fuzzyToleranceValue) {
+      if (distance <= fuzzyTolerance) {
         return true;
       }
     }
