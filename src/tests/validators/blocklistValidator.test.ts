@@ -66,4 +66,44 @@ describe("blocklistValidator", () => {
       errors: ["Password contains a substring too similar to a blocked term."],
     });
   });
+
+  it("should trim whitespace from blocklist terms when trimWhitespace is true", () => {
+    const result = blocklistValidator("mypassword", ["   password   "], {
+      trimWhitespace: true,
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain(
+      "Password contains a substring too similar to a blocked term."
+    );
+  });
+
+  it("should not trim whitespace from blocklist terms when trimWhitespace is false", () => {
+    const result = blocklistValidator("mypassword", ["   password   "], {
+      trimWhitespace: false,
+    });
+    expect(result.isValid).toBe(true); // Should be valid since the password does not match the untrimmed blocklist term
+    expect(result.errors).toEqual([]);
+  });
+
+  it("should handle mixed whitespace in blocklist terms correctly", () => {
+    const result = blocklistValidator(
+      "mypassword",
+      ["password", "   password   "],
+      {
+        trimWhitespace: true,
+      }
+    );
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain(
+      "Password contains a substring too similar to a blocked term."
+    );
+  });
+
+  it("should validate correctly when no blocklist terms are provided", () => {
+    const result = blocklistValidator("mypassword", [], {
+      trimWhitespace: true,
+    });
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
 });

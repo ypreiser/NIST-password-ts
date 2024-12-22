@@ -13,8 +13,14 @@ All notable changes to this project are documented here.
   - `minEditDistance`
   - `maxEditDistance`
   - `customDistanceCalculator`
+  - `trimWhitespace`
 - Comprehensive documentation and examples for the new matching system.
 - Improved handling of Unicode characters for blocklist validation.
+
+- Optional whitespace trimming for passwords and blocklist terms
+  - Enabled by default (NIST recommendation)
+  - Configurable via `trimWhitespace` option
+
 
 ### Fixed
 - Resolved an issue where short blocklist terms caused excessive false positives.

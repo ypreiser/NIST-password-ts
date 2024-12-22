@@ -11,6 +11,7 @@ import levenshteinDistance from "../utils/levenshteinDistance";
  * @param {number} [options.minEditDistance=0] - Minimum allowed edit distance.
  * @param {number} [options.maxEditDistance=5] - Maximum allowed edit distance.
  * @param {function} [options.customDistanceCalculator] - Custom function for calculating edit distance.
+ * @param {boolean} [options.trimWhitespace=true] - Flag to enable or disable trimming of whitespace from blocklist terms.
  * @returns {{ isValid: boolean, errors: string[] }} - Validation result, indicating validity and any errors.
  */
 export function blocklistValidator(
@@ -21,13 +22,15 @@ export function blocklistValidator(
     minEditDistance?: number;
     maxEditDistance?: number;
     customDistanceCalculator?: (term: string, password: string) => number;
+    trimWhitespace?: boolean;
   } = {}
 ): { isValid: boolean; errors: string[] } {
   const {
-    matchingSensitivity: matchingSensitivity = 0.25,
-    minEditDistance: minEditDistance = 0,
-    maxEditDistance: maxEditDistance = 5,
-    customDistanceCalculator: customDistanceCalculator,
+    matchingSensitivity = 0.25,
+    minEditDistance = 0,
+    maxEditDistance = 5,
+    customDistanceCalculator,
+    trimWhitespace = true,
   } = options;
 
   const errors: string[] = [];
@@ -36,7 +39,11 @@ export function blocklistValidator(
     return { isValid: true, errors };
   }
 
-  const isBlocked = blocklist.some((blockedWord) => {
+  const trimmedBlocklist = trimWhitespace
+    ? blocklist.map((term) => term.trim())
+    : blocklist;
+
+  const isBlocked = trimmedBlocklist.some((blockedWord) => {
     const fuzzyTolerance = customDistanceCalculator
       ? customDistanceCalculator(blockedWord, password)
       : Math.max(
