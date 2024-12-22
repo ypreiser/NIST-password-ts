@@ -8,7 +8,7 @@ import { ValidationOptions, ValidationResult } from "./types";
 /**
  * Validates a password against various criteria including length, blocklist, and breach checks.
  * @param {string} password - The password to validate.
- * @param {ValidationOptions} [options={}] - The validation options including minLength, maxLength, blocklist, fuzzyToleranceValue, and hibpCheck.
+ * @param {ValidationOptions} [options={}] - The validation options including minLength, maxLength, blocklist, scaling factors, and HIBP check settings.
  * @returns {Promise<ValidationResult>} - A promise that resolves to an object containing a boolean indicating validity and an array of error messages.
  */
 async function validatePassword(
@@ -36,11 +36,12 @@ async function validatePassword(
 
   // Blocklist validation
   if (options.blocklist) {
-    const blocklistResult = blocklistValidator(
-      password,
-      options.blocklist,
-      options.fuzzyToleranceValue || 3
-    );
+    const blocklistResult = blocklistValidator(password, options.blocklist, {
+      fuzzyScalingFactor: options.fuzzyScalingFactor,
+      minTolerance: options.minTolerance,
+      maxTolerance: options.maxTolerance,
+      customToleranceCalculator: options.customToleranceCalculator,
+    });
     errors.push(...blocklistResult.errors);
   }
 
@@ -52,4 +53,5 @@ async function validatePassword(
 
   return { isValid: errors.length === 0, errors };
 }
+
 export { validatePassword, lengthValidator, blocklistValidator, hibpValidator };

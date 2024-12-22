@@ -1,44 +1,59 @@
 // src\validators\blocklistValidator.ts
-import { ValidationResult } from "../types";
 import levenshteinDistance from "../utils/levenshteinDistance";
 
 /**
  * Validates a password against a blocklist, allowing for fuzzy matching.
+ * 
  * @param {string} password - The password to validate.
  * @param {string[] | null | undefined} blocklist - The list of blocked terms.
- * @param {number} [fuzzyToleranceValue=3] - The maximum allowed distance for fuzzy matching.
- * If the blocklist contains a term with the same length as this value, an error will be thrown.
- * @returns {ValidationResult} - The result of the validation, including whether the password is valid and any errors.
- * @throws {Error} - Throws an error if the blocklist contains a term with the same length as the fuzzy tolerance value.
+ * @param {object} [options] - Optional configuration for the validation process.
+ * @param {number} [options.fuzzyScalingFactor=0.25] - Scaling factor for dynamic fuzzy tolerance.
+ * @param {number} [options.minTolerance=0] - Minimum allowed fuzzy tolerance.
+ * @param {number} [options.maxTolerance=5] - Maximum allowed fuzzy tolerance.
+ * @param {function} [options.customToleranceCalculator] - Custom function for calculating tolerance.
+ * @returns {{ isValid: boolean, errors: string[] }} - Validation result, indicating validity and any errors.
  */
 export function blocklistValidator(
   password: string,
   blocklist: string[] | null | undefined,
-  fuzzyToleranceValue: number = 2
-): ValidationResult {
+  options: {
+    fuzzyScalingFactor?: number;
+    minTolerance?: number;
+    maxTolerance?: number;
+    customToleranceCalculator?: (term: string, password: string) => number;
+  } = {}
+): { isValid: boolean; errors: string[] } {
+  const {
+    fuzzyScalingFactor = 0.25,
+    minTolerance = 0,
+    maxTolerance = 5,
+    customToleranceCalculator,
+  } = options;
+
   const errors: string[] = [];
 
   if (!Array.isArray(blocklist) || blocklist.length === 0) {
     return { isValid: true, errors };
   }
 
-  // New check for blocklist entries with the same length as fuzzyToleranceValue + 1
-  if (
-    blocklist.some(
-      (blockedWord) => blockedWord.length === fuzzyToleranceValue + 1
-    )
-  ) {
-    throw new Error("Blocklist contains a term that is too short.");
-  }
-
   const isBlocked = blocklist.some((blockedWord) => {
+    const fuzzyTolerance = customToleranceCalculator
+      ? customToleranceCalculator(blockedWord, password)
+      : Math.max(
+          Math.min(
+            Math.floor(blockedWord.length * fuzzyScalingFactor),
+            maxTolerance
+          ),
+          minTolerance
+        );
+
     for (let i = 0; i <= password.length - blockedWord.length; i++) {
       const substring = password.substring(i, i + blockedWord.length);
       const distance = levenshteinDistance(
         substring.toLowerCase(),
         blockedWord.toLowerCase()
       );
-      if (distance <= fuzzyToleranceValue) {
+      if (distance <= fuzzyTolerance) {
         return true;
       }
     }

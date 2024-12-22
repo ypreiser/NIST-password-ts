@@ -34,18 +34,68 @@ describe("Input Validator", () => {
     expect(result).toEqual(["Blocklist must be an array."]);
   });
 
-  it("should return an error if fuzzyToleranceValue is not a number", () => {
-    const options: ValidationOptions = { fuzzyToleranceValue: "3" as any };
+  it("should return an error if fuzzyScalingFactor is not a number", () => {
+    const options: ValidationOptions = { fuzzyScalingFactor: "0.5" as any };
     const result = validateInput("validPassword", options);
-    expect(result).toEqual(["Fuzzy tolerance must be a number."]);
+    expect(result).toEqual(["Fuzzy scaling factor must be a number."]);
   });
 
-  it("should return no errors for valid input", () => {
+  it("should return an error if fuzzyScalingFactor is out of range", () => {
+    const options: ValidationOptions = { fuzzyScalingFactor: -0.1 };
+    const result = validateInput("validPassword", options);
+    expect(result).toEqual(["Fuzzy scaling factor must be between 0 and 1."]);
+  });
+
+  it("should return an error if fuzzyScalingFactor is greater than 1", () => {
+    const options: ValidationOptions = { fuzzyScalingFactor: 1.5 };
+    const result = validateInput("validPassword", options);
+    expect(result).toEqual(["Fuzzy scaling factor must be between 0 and 1."]);
+  });
+
+  it("should return an error if minTolerance is not a number", () => {
+    const options: ValidationOptions = { minTolerance: "1" as any };
+    const result = validateInput("validPassword", options);
+    expect(result).toEqual(["Min tolerance must be a number."]);
+  });
+
+  it("should return an error if maxTolerance is not a number", () => {
+    const options: ValidationOptions = { maxTolerance: "5" as any };
+    const result = validateInput("validPassword", options);
+    expect(result).toEqual(["Max tolerance must be a number."]);
+  });
+
+  it("should return an error if minTolerance is greater than maxTolerance", () => {
+    const options: ValidationOptions = { minTolerance: 5, maxTolerance: 3 };
+    const result = validateInput("validPassword", options);
+    expect(result).toEqual([
+      "Min tolerance cannot be greater than maximum tolerance.",
+    ]);
+  });
+
+  it("should return an error if minTolerance is less than 0", () => {
+    const options: ValidationOptions = { minTolerance: -1 };
+    const result = validateInput("validPassword", options);
+    expect(result).toEqual([
+      "Min tolerance must be greater than or equal to 0.",
+    ]);
+  });
+
+  it("should return an error if maxTolerance is less than 0", () => {
+    const options: ValidationOptions = { maxTolerance: -1 };
+    const result = validateInput("validPassword", options);
+    expect(result).toEqual([
+      "Max tolerance must be greater than or equal to 0.",
+    ]);
+  });
+
+  it("should return no errors for valid input with tolerances", () => {
     const options: ValidationOptions = {
       minLength: 8,
       maxLength: 64,
       blocklist: [],
-      fuzzyToleranceValue: 3,
+      minTolerance: 0,
+      maxTolerance: 4,
+      fuzzyScalingFactor: 0.3,
     };
     const result = validateInput("validPassword", options);
     expect(result).toEqual([]);

@@ -33,12 +33,12 @@ describe("Password Validation", () => {
     expect(result.errors).toContain("Blocklist must be an array.");
   });
 
-  it("should return an error for invalid fuzzyToleranceValue", async () => {
+  it("should return an error for invalid fuzzyScalingFactor", async () => {
     const result = await validatePassword("validPassword", {
-      fuzzyToleranceValue: "3" as any,
+      fuzzyScalingFactor: "0.25" as any,
     });
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain("Fuzzy tolerance must be a number.");
+    expect(result.errors).toContain("Fuzzy scaling factor must be a number.");
   });
 
   it("should validate a valid password", async () => {
@@ -46,7 +46,6 @@ describe("Password Validation", () => {
       minLength: 8,
       maxLength: 64,
       blocklist: [],
-      fuzzyToleranceValue: 3,
     });
     expect(result.isValid).toBe(true);
     expect(result.errors).toEqual([]);
@@ -113,14 +112,57 @@ describe("Password Validation", () => {
     expect(result.errors).toEqual([]);
   });
 
-  it("should use default fuzzyToleranceValue of 3 when fuzzyToleranceValue is null", async () => {
-    const result = await validatePassword("validPassword", {
+  it("should validate passwords with blocklist and dynamic tolerance", async () => {
+    const result = await validatePassword("myp@ssword", {
+      blocklist: ["password", "123456"],
+      fuzzyScalingFactor: 0.3,
+      minTolerance: 1,
+      maxTolerance: 5,
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain(
+      "Password contains a substring too similar to a blocked term."
+    );
+  });
+
+  it("should use default fuzzyScalingFactor when null", async () => {
+    const result = await validatePassword("validPassword💥", {
       minLength: 8,
-      hibpCheck: false,
-      blocklist: ["not-validPassword"],
+      blocklist: ["notvalid"],
     });
     expect(result.isValid).toBe(true);
     expect(result.errors).toEqual([]);
+  });
 
+  it("should validate using a customToleranceCalculator", async () => {
+    const result = await validatePassword("mypassword", {
+      blocklist: ["password"],
+      customToleranceCalculator: (term) => Math.floor(term.length / 4),
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain(
+      "Password contains a substring too similar to a blocked term."
+    );
+  });
+
+  it("should handle passwords with overlapping blocklist terms", async () => {
+    const result = await validatePassword("pass1234word", {
+      blocklist: ["password", "1234"],
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain(
+      "Password contains a substring too similar to a blocked term."
+    );
+  });
+
+  it("should return an error for a password with overlapping Unicode terms", async () => {
+    const result = await validatePassword("Pä123", {
+      blocklist: ["pä", "123"],
+      fuzzyScalingFactor: 0.25,
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain(
+      "Password contains a substring too similar to a blocked term."
+    );
   });
 });
