@@ -2,20 +2,20 @@
 
 A lightweight, zero-dependencies open-source password validator according to NIST guidelines.
 
-Try it out: [NIST Password Validator Demo](https://nist-password-validator.netlify.app/)
+Try it out: [Test the library with a user-friendly front-end demo site.](https://nist-password-validator.netlify.app/)
 
 ### **Introduction**
 
-This library provides a robust password validation solution based on the [NIST Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-4/sp800-63b.html) for password security. It is designed to be secure, easy to use, and customizable, adhering to modern password validation practices, including checking against known data breaches and implementing Unicode-compliant password length validation.
+This library provides a robust password validation solution based on the [NIST Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-4/sp800-63b.html). It ensures modern password security with support for Unicode, known data breach checks, and customizable validation rules.
 
 ---
 
 ### **Why NIST Guidelines?**
 
-Passwords are often the weakest link in securing digital systems. To mitigate this, the National Institute of Standards and Technology (NIST) released updated recommendations for password policies. These include:
+Passwords are a critical aspect of digital security. The National Institute of Standards and Technology (NIST) has established recommendations to improve password policies. Key principles include:
 
 1. **Minimum Length**: Passwords should be at least **8 characters** (15 characters or more recommended) to enhance resistance against brute-force attacks.
-2. **Maximum Length**: Verifiers must support passwords up to **64 characters**. Extremely long passwords (perhaps megabytes long) could require excessive processing time to hash, so it is reasonable to impose a limit.
+2. **Maximum Length**: Verifiers must support passwords up to **64 characters** at least, the more the better. Although Extremely long passwords (perhaps megabytes long) could require excessive processing time to hash, so it is reasonable to impose a limit.
 3. **No Character Composition Rules**: Avoid enforcing arbitrary rules like requiring special characters or mixtures of uppercase/lowercase letters.
 4. **Unicode Support**: Accept all Unicode characters, ensuring inclusivity and usability.
 5. **Compromised Password Checks**: Block passwords that have appeared in previous data breaches.
@@ -36,6 +36,7 @@ This library implements these principles to ensure secure and user-friendly pass
 - **Blocklist with Fuzzy Matching**:
   - Identifies passwords similar to blocklisted terms.
   - Includes leetspeak transformations and fuzzy matching.
+  - Advanced matching with configurable sensitivity.
 - **Customizable Rules**:
   - Adjustable password length limits.
   - Configurable blocklist and fuzzy tolerance.
@@ -89,7 +90,7 @@ async function checkCustomPassword() {
     maxLength: 500000, // Custom maximum length (default: 100K)
     hibpCheck: false, // Disable HIBP check if using local hash database
     blocklist: ["password"], // Custom blocklist
-    fuzzyToleranceValue: 1, // Custom fuzzy tolerance (default: 2)
+    matchingSensitivity: 0.2, // Custom matching sensitivity (default: 0.25)
   });
 
   if (!result.isValid) {
@@ -107,7 +108,6 @@ checkCustomPassword();
 ### **Validators**
 
 1. **Length Validation**:
-
    - Ensures the password's length is between the specified minimum and maximum.
    - Counts Unicode code points instead of raw bytes to ensure inclusivity.
 
@@ -119,22 +119,44 @@ checkCustomPassword();
    ```
 
 2. **Blocklist Validation**:
-//TODO: update section
-
-
-
-   - Detects passwords similar to blocklisted terms, including leetspeak and fuzzy matching.
-   - **Fuzzy Tolerance**: If the blocklist contains a term with the same length as the `fuzzyToleranceValue + 1`, an error will be thrown to prevent false positives.
+   The blocklist validator prevents passwords that are similar to commonly used or forbidden terms. It implements an intelligent fuzzy matching system that adapts to term length for optimal security.
 
    ```typescript
    import { blocklistValidator } from "nist-password-validator";
 
-   const result = blocklistValidator("myp@ssw0rd!", ["password"], 2);
-   console.log(result);
+   interface BlocklistOptions {
+     matchingSensitivity?: number;    // Default: 0.25 - Controls how strict the matching is
+     minEditDistance?: number;        // Default: 1 - Minimum allowed character differences
+     maxEditDistance?: number;        // Default: 5 - Maximum allowed character differences
+     customDistanceCalculator?: (term: string, password: string) => number;
+   }
+
+   // Basic usage
+   const result = blocklistValidator("myp@ssw0rd!", ["password"], {
+     matchingSensitivity: 0.25
+   });
+
+   // Exact matching (no fuzzy matching)
+   const exactResult = blocklistValidator("myp@ssw0rd!", ["password"], {
+     matchingSensitivity: 0,
+     minEditDistance: 0
+   });
+
+   // Custom distance calculation
+   const customResult = blocklistValidator("mypassword", ["password"], {
+     customDistanceCalculator: (term, password) => {
+       return term.length < 5 ? 1 : Math.floor(term.length * 0.3);
+     }
+   });
    ```
 
-3. **HIBP Validation**:
+   **How Matching Works**:
+   - **Default Behavior**: The allowed difference between password and blocklist terms is calculated as: `term.length × matchingSensitivity`
+   - **Bounds**: The result is constrained between `minEditDistance` and `maxEditDistance`
+   - **Exact Matching**: Set both `matchingSensitivity` and `minEditDistance` to 0
+   - **Custom Logic**: Provide a `customDistanceCalculator` for complete control
 
+3. **HIBP Validation**:
    - Uses the **Have I Been Pwned** API to check for compromised passwords.
    - Implements k-anonymity and padding for enhanced security and privacy protection.
 
@@ -153,23 +175,22 @@ checkCustomPassword();
 
 2. **Hashing Before Sending to HIBP**:
    The HIBP validator implements k-anonymity with padding when checking passwords:
-
    - Passwords are hashed using SHA-1 locally.
    - Only a prefix of the hash is sent to the API.
    - Responses include padding to enhance security and privacy.
    - No plaintext passwords are ever transmitted.
 
-3. **Blocklist for Organizational Security**:
-   Use the blocklist feature to prevent users from setting passwords similar to commonly used terms or organizationally sensitive words (e.g., project name).
+3. **Blocklist Security**:
+   - Use organization-specific terms in the blocklist
+   - Consider password length when setting matching sensitivity
+   - Test fuzzy matching with common variations of blocked terms
+   - Set appropriate min/max edit distances for your security needs
+   - Use exact matching (sensitivity = 0, minEditDistance = 0) for critical terms
 
-4. **Testing Fuzzy Matching**:
-   Validate fuzzy matching rules to ensure they appropriately block passwords with minor variations.
-
-5. **Protect API Usage**:
-   Use rate-limiting and error-handling for HIBP API calls to prevent abuse or service interruptions.
-
-6. **Local Hash Database Option**:
-   The HIBP check can be disabled to allow using a local database of compromised password hashes, enabling complete control over the validation process.
+4. **API Protection**:
+   - Implement rate limiting for HIBP API calls
+   - Handle API errors gracefully
+   - Consider using a local hash database for high-security environments
 
 ---
 

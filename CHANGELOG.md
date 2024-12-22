@@ -2,55 +2,77 @@
 
 All notable changes to this project are documented here.
 
-## [1.0.7] - 2024-12-19
-### Fixed
-- Fixed short blocklist bug.
-- Updated README with corrections.
+## [2.0.0] - 2024-12-22
+### Breaking Changes
+- Removed `fuzzyTolerance` parameter.
+- Replaced static fuzzy matching with a dynamic system.
 
 ### Added
-- Initial `CHANGELOG.md`.
+- New blocklist validation configuration options:
+  - `matchingSensitivity` 
+  - `minEditDistance`
+  - `maxEditDistance`
+  - `customDistanceCalculator`
+- Comprehensive documentation and examples for the new matching system.
+- Improved handling of Unicode characters for blocklist validation.
+
+### Fixed
+- Resolved an issue where short blocklist terms caused excessive false positives.
+
+### Migration Guide
+Users upgrading from `1.x.x` to `2.0.0` should:
+1. Replace `fuzzyTolerance` with the new configuration options (`matchingSensitivity`, `minEditDistance`, `maxEditDistance`, or `customDistanceCalculator`).
+2. Review and test existing blocklists to ensure compatibility with the new dynamic matching algorithm.
+3. Update integration tests to align with the updated API.
+
+---
+
+## [1.0.7] - 2024-12-19
+### Fixed
+- Resolved a bug where short blocklist terms caused false positives.
+- Updated README for better clarity.
+
+---
 
 ## [1.0.6] - 2024-12-18
 ### Added
 - Added padding for HIBP (Have I Been Pwned) API integration.
 
+---
+
 ## [1.0.5] - 2024-12-17
 ### Fixed
-- Fixed README with corrections.
-
-## [1.0.4] - 2024-12-15
-### Added
-- Added new test cases for the project.
-- Documented code with JSDoc comment blocks.
-- Updated README.
-
-## [1.0.3] - 2024-12-12
-### Changed
-- Changed "blacklist" to "blocklist" for terminology improvements.
-- Default maximum value updated to 100K.
-
-### Added
-- Added additional test cases.
-- Added project keywords.
-
-## [1.0.2] - 2024-12-12
-### Fixed
-- Fixed exports and updated README.
-
-## [1.0.1] - 2024-12-12
-### Changed
-- Renamed file from `nist-password-validator.js` to `nist-password-validator`.
+- Minor corrections in the README.
 
 ---
 
-### Unreleased
-The following changes have been made but are not yet associated with a specific release version:
+## [1.0.4] - 2024-12-15
+### Added
+- New test cases for additional validation scenarios.
+- Improved code documentation with JSDoc comment blocks.
+- README updates for detailed usage examples.
+
+---
+
+## [1.0.3] - 2024-12-12
+### Changed
+- Terminology update: Replaced "blacklist" with "blocklist."
+- Updated default maximum password length to 100K characters.
 
 ### Added
-- Added ESLint to improve code quality.
-- Added initial project structure and test cases.
+- Expanded test coverage with new cases.
+- Added project keywords for discoverability.
 
+---
+
+## [1.0.2] - 2024-12-12
 ### Fixed
-- Fixed small issues in README.
-- Fixed tests.
+- Export issues resolved for smoother library usage.
+- README corrections for consistency.
+
+---
+
+## [1.0.1] - 2024-12-12
+### Changed
+- Renamed the library file from `nist-password-validator.js` to `nist-password-validator`.
 
