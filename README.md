@@ -121,6 +121,8 @@ checkCustomPassword();
 2. **Blocklist Validation**:
 //TODO: update section
 
+
+
    - Detects passwords similar to blocklisted terms, including leetspeak and fuzzy matching.
    - **Fuzzy Tolerance**: If the blocklist contains a term with the same length as the `fuzzyToleranceValue + 1`, an error will be thrown to prevent false positives.
 

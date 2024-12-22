@@ -37,10 +37,10 @@ async function validatePassword(
   // Blocklist validation
   if (options.blocklist) {
     const blocklistResult = blocklistValidator(password, options.blocklist, {
-      fuzzyScalingFactor: options.fuzzyScalingFactor,
-      minTolerance: options.minTolerance,
-      maxTolerance: options.maxTolerance,
-      customToleranceCalculator: options.customToleranceCalculator,
+      fuzzyScalingFactor: options.matchingSensitivity,
+      minTolerance: options.minEditDistance,
+      maxTolerance: options.maxEditDistance,
+      customToleranceCalculator: options.customDistanceCalculator,
     });
     errors.push(...blocklistResult.errors);
   }

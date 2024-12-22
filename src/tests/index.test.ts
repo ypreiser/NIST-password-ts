@@ -35,7 +35,7 @@ describe("Password Validation", () => {
 
   it("should return an error for invalid fuzzyScalingFactor", async () => {
     const result = await validatePassword("validPassword", {
-      fuzzyScalingFactor: "0.25" as any,
+      matchingSensitivity: "0.25" as any,
     });
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain("Fuzzy scaling factor must be a number.");
@@ -115,9 +115,9 @@ describe("Password Validation", () => {
   it("should validate passwords with blocklist and dynamic tolerance", async () => {
     const result = await validatePassword("myp@ssword", {
       blocklist: ["password", "123456"],
-      fuzzyScalingFactor: 0.3,
-      minTolerance: 1,
-      maxTolerance: 5,
+      matchingSensitivity: 0.3,
+      minEditDistance: 1,
+      maxEditDistance: 5,
     });
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
@@ -137,7 +137,7 @@ describe("Password Validation", () => {
   it("should validate using a customToleranceCalculator", async () => {
     const result = await validatePassword("mypassword", {
       blocklist: ["password"],
-      customToleranceCalculator: (term) => Math.floor(term.length / 4),
+      customDistanceCalculator: (term) => Math.floor(term.length / 4),
     });
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
@@ -158,7 +158,7 @@ describe("Password Validation", () => {
   it("should return an error for a password with overlapping Unicode terms", async () => {
     const result = await validatePassword("Pä123", {
       blocklist: ["pä", "123"],
-      fuzzyScalingFactor: 0.25,
+      matchingSensitivity: 0.25,
     });
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
