@@ -67,6 +67,16 @@ describe("blocklistValidator", () => {
     });
   });
 
+  it("validates a password using default minEditDistance of 1", () => {
+    const result = blocklistValidator("abc", ["1"], {
+      minEditDistance: 1,
+    });
+    expect(result).toEqual({
+      isValid: false,
+      errors: ["Password contains a substring too similar to a blocked term."],
+    });
+  });
+
   it("should trim whitespace from blocklist terms when trimWhitespace is true", () => {
     const result = blocklistValidator("mypassword", ["   password   "], {
       trimWhitespace: true,
