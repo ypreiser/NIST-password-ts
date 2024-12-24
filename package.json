@@ -8,6 +8,7 @@
     "vite-build": "vite build",
     "dev": "vite",
     "test": "vitest --coverage",
+    "testui": "vitest --coverage --ui",
     "build": "tsup src",
     "lint": "eslint .",
     "prepare": "npm run build"
