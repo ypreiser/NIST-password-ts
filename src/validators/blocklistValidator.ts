@@ -38,9 +38,9 @@ export function blocklistValidator(
 
   const errors: string[] = [];
 
-  if (!Array.isArray(blocklist) || blocklist.length === 0) {
-    return { isValid: true, errors };
-  }
+if (!Array.isArray(blocklist) || blocklist.length === 0 || blocklist.every(term => term === "")) {
+  return { isValid: true, errors };
+}
 
   // Preprocess blocklist into a Set for fast lookups
   const processedBlocklistSet = new Set(
@@ -79,14 +79,14 @@ export function blocklistValidator(
     return false;
   };
 
-  // Main validation loop
-  const blockedTerm = Array.from(processedBlocklistSet).find((term) =>
+  const matchingTerms = Array.from(processedBlocklistSet).filter((term) =>
     isTermBlocked(term)
   );
-
-  if (blockedTerm) {
-    errors.push(`Password contains a substring too similar to: "${blockedTerm}".`);
-  }
+  
+  matchingTerms.forEach((term) => {
+    errors.push(`Password contains a substring too similar to: "${term}".`);
+  });
+   
 
   return { isValid: errors.length === 0, errors };
 }

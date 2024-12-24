@@ -130,7 +130,7 @@ checkCustomPassword();
 
    interface BlocklistOptions {
      matchingSensitivity?: number; // Default: 0.25 - Controls how strict the matching is
-     minEditDistance?: number; // Default: 0 - Minimum allowed character differences
+     minEditDistance?: number; // Default: 0 - Minimum allowed character differences 
      maxEditDistance?: number; // Default: 5 - Maximum allowed character differences
      customDistanceCalculator?: (term: string, password: string) => number;
      trimWhitespace?: boolean; // Default: true - Enables trimming of whitespace from blocklist terms
