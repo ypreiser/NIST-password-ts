@@ -129,9 +129,9 @@ checkCustomPassword();
    import { blocklistValidator } from "nist-password-validator";
 
    interface BlocklistOptions {
-     matchingSensitivity?: number; // Default: 0.25 - Controls how strict the matching is
-     minEditDistance?: number; // Default: 1 - Minimum allowed character differences
-     maxEditDistance?: number; // Default: 5 - Maximum allowed character differences
+     matchingSensitivity?: number; // Default: 0.25 - Controls how strict the matching is based on the length of the blocklist terms.
+     minEditDistance?: number; // Disabled! - Allways 0 to prevent false positives.
+     maxEditDistance?: number; // Default: 5 - Maximum allowed character differences for fuzzy matching.
      customDistanceCalculator?: (term: string, password: string) => number;
      trimWhitespace?: boolean; // Default: true - Enables trimming of whitespace from blocklist terms
    }
@@ -161,6 +161,29 @@ checkCustomPassword();
    - **Bounds**: The result is constrained between `minEditDistance` and `maxEditDistance`
    - **Exact Matching**: Set both `matchingSensitivity` and `minEditDistance` to 0
    - **Custom Logic**: Provide a `customDistanceCalculator` for complete control
+
+**Customizing the Blocklist**  
+To enhance security, you can extend the blocklist with personal information like names, email addresses, or birth dates. This ensures that passwords based on easily guessable personal data are prohibited.
+
+#### **Example:**
+
+```typescript
+import { validatePassword } from "nist-password-validator";
+
+// Define personal information
+const name = "John Doe";
+const email = "john.doe@example.com";
+const dob = "1990-01-01";
+
+// Create a personal blocklist
+const personalBlocklist = [name, email, dob];
+
+// Validate the password using the custom blocklist
+const result = await validatePassword("mypassword", { blocklist: personalBlocklist });
+```
+
+This customization ensures compliance with NIST guidelines and prevents users from creating insecure passwords based on personal details.
+
 
 3. **HIBP Validation**:
 

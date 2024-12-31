@@ -8,17 +8,104 @@ describe("blocklistValidator", () => {
     expect(result).toEqual({ isValid: true, errors: [] });
   });
 
-  it("validates passwords with UTF-8 characters", () => {
-    const result = blocklistValidator("p@sswörd", ["p@ssword"]);
+  it("validates passwords with short terms in the blocklist using exact matching", () => {
+    const result = blocklistValidator("mypassword", ["1", "b", "pass"], {
+      bypassFuzzyForShortTerms: true,
+    });
     expect(result).toEqual({
       isValid: false,
-      errors: ["Password contains a substring too similar to a blocked term."],
+      errors: ['Password contains a substring too similar to: "pass".'],
+    });
+  });
+
+  it("validates a password not in the blocklist", () => {
+    const result = blocklistValidator("secret", ["password", "123456"]);
+    expect(result).toEqual({ isValid: true, errors: [] });
+  });
+
+  it("validates passwords with short terms in the blocklist using exact matching", () => {
+    const result = blocklistValidator("mypassword", ["a", "b"], {
+      bypassFuzzyForShortTerms: true,
+    });
+    expect(result).toEqual({
+      isValid: false,
+      errors: ['Password contains a substring too similar to: "a".'],
+    });
+  });
+  it("validates passwords with short terms in the blocklist using mixed case exact matching", () => {
+    const result = blocklistValidator("mypassword", ["A", "b"], {
+      bypassFuzzyForShortTerms: false,
+    });
+    expect(result).toEqual({
+      isValid: false,
+      errors: ['Password contains a substring too similar to: "a".'],
+    });
+  });
+
+  it("does not throw false positives for shorrt terms with no bypassFuzzyForShortTerms", () => {
+    const result = blocklistValidator("mypassword", ["B"], {
+      bypassFuzzyForShortTerms: false,
+    });
+    expect(result).toEqual({ isValid: true, errors: [] });
+  });
+  it("does not throw false positives for shorrt terms with bypassFuzzyForShortTerms", () => {
+    const result = blocklistValidator("mypassword", ["B"], {
+      bypassFuzzyForShortTerms: true,
+    });
+    expect(result).toEqual({ isValid: true, errors: [] });
+  });
+
+  it("validates passwords with multiple blocked terms", () => {
+    const result = blocklistValidator("mypassword123", ["password", "123"]);
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain(
+      'Password contains a substring too similar to: "password".'
+    );
+    expect(result.errors).toContain(
+      'Password contains a substring too similar to: "123".'
+    );
+  });
+
+  it("should bypass fuzzy matching for short terms and use exact matching", () => {
+    const result = blocklistValidator("mypassword", ["1", "b", "pass"], {
+      bypassFuzzyForShortTerms: true, // Enable bypassing fuzzy matching
+    });
+    expect(result).toEqual({
+      isValid: false,
+      errors: ['Password contains a substring too similar to: "pass".'],
+    });
+  });
+
+  it("validates passwords with UTF-8 characters", () => {
+    const result = blocklistValidator("p@sswörd", ["password"]);
+    expect(result).toEqual({
+      isValid: false,
+      errors: ['Password contains a substring too similar to: "password".'],
+    });
+  });
+
+  it("validates passwords with UTF-8 characters in blocklist", () => {
+    const result = blocklistValidator("password", ["p@sswörd"], {});
+    expect(result).toEqual({
+      isValid: false,
+      errors: ['Password contains a substring too similar to: "p@sswörd".'],
     });
   });
 
   it("validates complex UTF-8 characters", () => {
     const result = blocklistValidator("passw😊rd", ["password"]);
-    expect(result).toEqual({ isValid: true, errors: [] });
+    expect(result).toEqual({
+      isValid: false,
+      errors: ['Password contains a substring too similar to: "password".'],
+    });
+  });
+
+  it("validates complex UTF-8 characters in blocklist", () => {
+    const result = blocklistValidator("password", ["passw😊rd"]);
+    expect(result).toEqual({
+      isValid: false,
+      errors: ['Password contains a substring too similar to: "passw😊rd".'],
+    });
   });
 
   it("validates a password when fuzzy matching is disabled", () => {
@@ -26,14 +113,6 @@ describe("blocklistValidator", () => {
       maxEditDistance: 0,
     });
     expect(result).toEqual({ isValid: true, errors: [] });
-  });
-
-  it("handles overlapping blocklist terms and passwords", () => {
-    const result = blocklistValidator("mypassword123", ["password", "123"]);
-    expect(result).toEqual({
-      isValid: false,
-      errors: ["Password contains a substring too similar to a blocked term."],
-    });
   });
 
   it("validates an empty password", () => {
@@ -45,7 +124,7 @@ describe("blocklistValidator", () => {
     const result = blocklistValidator("secure_pass", ["secure_pass"]);
     expect(result).toEqual({
       isValid: false,
-      errors: ["Password contains a substring too similar to a blocked term."],
+      errors: ['Password contains a substring too similar to: "secure_pass".'],
     });
   });
 
@@ -55,7 +134,7 @@ describe("blocklistValidator", () => {
     });
     expect(result).toEqual({
       isValid: false,
-      errors: ["Password contains a substring too similar to a blocked term."],
+      errors: ['Password contains a substring too similar to: "password".'],
     });
   });
 
@@ -63,7 +142,7 @@ describe("blocklistValidator", () => {
     const result = blocklistValidator("pass1234", ["password", "1234"], {});
     expect(result).toEqual({
       isValid: false,
-      errors: ["Password contains a substring too similar to a blocked term."],
+      errors: ['Password contains a substring too similar to: "1234".'],
     });
   });
 
@@ -73,7 +152,7 @@ describe("blocklistValidator", () => {
     });
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
-      "Password contains a substring too similar to a blocked term."
+      'Password contains a substring too similar to: "password".'
     );
   });
 
@@ -81,7 +160,7 @@ describe("blocklistValidator", () => {
     const result = blocklistValidator("mypassword", ["   password   "], {
       trimWhitespace: false,
     });
-    expect(result.isValid).toBe(true); // Should be valid since the password does not match the untrimmed blocklist term
+    expect(result.isValid).toBe(true);
     expect(result.errors).toEqual([]);
   });
 
@@ -95,7 +174,7 @@ describe("blocklistValidator", () => {
     );
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
-      "Password contains a substring too similar to a blocked term."
+      'Password contains a substring too similar to: "password".'
     );
   });
 
@@ -105,5 +184,23 @@ describe("blocklistValidator", () => {
     });
     expect(result.isValid).toBe(true);
     expect(result.errors).toEqual([]);
+  });
+
+  it("should validate correctly when no blocklist contians empty string", () => {
+    const result = blocklistValidator("mypassword", [""], {});
+    console.log(result);
+
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
+
+  it("should use exact matching with the processed blocklist", () => {
+    const result = blocklistValidator("hello1", ["1"], {
+      matchingSensitivity: 1,
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain(
+      'Password contains a substring too similar to: "1".'
+    );
   });
 });

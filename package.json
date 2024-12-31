@@ -1,6 +1,6 @@
 {
   "name": "nist-password-validator",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "dist/index.js",
   "types": "dist/types.js",
   "module": "dist/index.js",
@@ -8,6 +8,7 @@
     "vite-build": "vite build",
     "dev": "vite",
     "test": "vitest --coverage",
+    "testui": "vitest --coverage --ui",
     "build": "tsup src",
     "lint": "eslint .",
     "prepare": "npm run build"

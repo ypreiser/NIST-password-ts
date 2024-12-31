@@ -37,4 +37,9 @@ describe('levenshteinDistance', () => {
     expect(levenshteinDistance('hello', 'Hello')).toBe(1);
     expect(levenshteinDistance('WORLD', 'world')).toBe(5);
   });
+
+    it('should handle emojis as', () => {
+      expect(levenshteinDistance('', '😀')).toBe(1);
+      expect(levenshteinDistance('👍🏾', '')).toBe(2);
+    });
 }); 

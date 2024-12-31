@@ -121,7 +121,7 @@ describe("Password Validation", () => {
     });
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
-      "Password contains a substring too similar to a blocked term."
+      'Password contains a substring too similar to: "password".'
     );
   });
 
@@ -141,17 +141,17 @@ describe("Password Validation", () => {
     });
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
-      "Password contains a substring too similar to a blocked term."
+      'Password contains a substring too similar to: "password".'
     );
   });
 
   it("should handle passwords with overlapping blocklist terms", async () => {
     const result = await validatePassword("pass1234word", {
       blocklist: ["password", "1234"],
-    });
+    });    
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
-      "Password contains a substring too similar to a blocked term."
+      'Password contains a substring too similar to: "1234".'
     );
   });
 
@@ -162,7 +162,7 @@ describe("Password Validation", () => {
     });
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
-      "Password contains a substring too similar to a blocked term."
+      'Password contains a substring too similar to: "pä".'
     );
   });
 
@@ -191,7 +191,7 @@ describe("Password Validation", () => {
     });
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain(
-      "Password contains a substring too similar to a blocked term."
+      'Password contains a substring too similar to: "password".'
     );
   });
 
