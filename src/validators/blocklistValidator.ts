@@ -6,14 +6,13 @@ import {getUtf8Length} from "../utils/utf8Length";
  *
  * @param {string} password - The password to validate.
  * @param {string[] | null | undefined} blocklist - The list of blocked terms.
- * @param {object} [options] - Optional configuration for the validation process.
- * @param {number} [options.matchingSensitivity=0.25] - Scaling factor for dynamic matching sensitivity.
- * @param {number} [options.minEditDistance=0] - Disabled!
- * @param {number} [options.maxEditDistance=5] - Maximum allowed edit distance.
- * @param {function} [options.customDistanceCalculator] - Custom function for calculating edit distance.
- * @param {boolean} [options.trimWhitespace=true] - Flag to enable or disable trimming of whitespace from blocklist terms.
- * @param {boolean} [options.bypassFuzzyForShortTerms=true] - Skip fuzzy matching for short blocklist terms.
- * @returns {{ isValid: boolean, errors: string[] }} - Validation result, indicating validity and any errors.
+ * @param {object} [options] - Optional settings to customize validation.
+ * @param {number} [options.matchingSensitivity=0.25] - Controls matching strictness based on term length. Default is 0.25 (25%).
+ * @param {number} [options.minEditDistance=0] - Disabled! - Allways 0 to prevent false positives.
+ * @param {number} [options.maxEditDistance=5] - Maximum character differences allowed for fuzzy matches. Default is 5.
+ * @param {function} [options.customDistanceCalculator] - Custom function to calculate edit distance.
+ * @param {boolean} [options.trimWhitespace=true] - Whether to trim leading/trailing whitespace from blocklist terms. Default is true.
+ * @returns {{ isValid: boolean, errors: string[] }} - The validation result with any errors.
  */
 export function blocklistValidator(
   password: string,
@@ -24,7 +23,6 @@ export function blocklistValidator(
     maxEditDistance?: number;
     customDistanceCalculator?: (term: string, password: string) => number;
     trimWhitespace?: boolean;
-    bypassFuzzyForShortTerms?: boolean;
   } = {}
 ): { isValid: boolean; errors: string[] } {
   const {
@@ -33,7 +31,6 @@ export function blocklistValidator(
     maxEditDistance = 5,
     customDistanceCalculator,
     trimWhitespace = true,
-    bypassFuzzyForShortTerms = true,
   } = options;
 
   const errors: string[] = [];
@@ -65,7 +62,7 @@ if (!Array.isArray(blocklist) || blocklist.length === 0 || blocklist.every(term 
     const fuzzyTolerance = calculateFuzzyTolerance(blockedWord);
 
     // Use Set for exact matching when bypassing fuzzy matching for short terms
-    if (bypassFuzzyForShortTerms && getUtf8Length(blockedWord) <= fuzzyTolerance) {
+    if (getUtf8Length(blockedWord) <= fuzzyTolerance) {
       return processedBlocklistSet.has(blockedWord.toLowerCase());
     }
 

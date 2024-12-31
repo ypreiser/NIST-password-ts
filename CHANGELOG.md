@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here.
 
+## [2.0.1] - 2024-12-31
+### Added
+- Improved the efficiency of the blocklist validator.
+- Added a detailed example to the README for customizing the blocklist with personal information.
+
+### Fixed
+- Disabled minEditDistance to prevent false positives caused by short blocklist terms.
+- Updated the README for better clarity and usage details.
+- Adjusted the Levenshtein Distance algorithm to better handle UTF-8 characters.
+
+---
+
 ## [2.0.0] - 2024-12-22
 ### Breaking Changes
 - Removed `fuzzyTolerance` parameter.
