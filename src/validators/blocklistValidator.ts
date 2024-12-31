@@ -8,7 +8,7 @@ import {getUtf8Length} from "../utils/utf8Length";
  * @param {string[] | null | undefined} blocklist - The list of blocked terms.
  * @param {object} [options] - Optional configuration for the validation process.
  * @param {number} [options.matchingSensitivity=0.25] - Scaling factor for dynamic matching sensitivity.
- * @param {number} [options.minEditDistance=0] - Minimum allowed edit distance.
+ * @param {number} [options.minEditDistance=0] - Disabled!
  * @param {number} [options.maxEditDistance=5] - Maximum allowed edit distance.
  * @param {function} [options.customDistanceCalculator] - Custom function for calculating edit distance.
  * @param {boolean} [options.trimWhitespace=true] - Flag to enable or disable trimming of whitespace from blocklist terms.
