@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [2.0.2] - 2025-01-06
+### Fixed
+- empty string handling in blocklist
+
+---
+
 ## [2.0.1] - 2024-12-31
 ### Added
 - Improved the efficiency of the blocklist validator.
