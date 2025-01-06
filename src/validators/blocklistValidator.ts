@@ -1,5 +1,5 @@
 import levenshteinDistance from "../utils/levenshteinDistance";
-import {getUtf8Length} from "../utils/utf8Length";
+import { getUtf8Length } from "../utils/utf8Length";
 
 /**
  * Validates a password against a blocklist, allowing for fuzzy matching.
@@ -35,9 +35,13 @@ export function blocklistValidator(
 
   const errors: string[] = [];
 
-if (!Array.isArray(blocklist) || blocklist.length === 0 || blocklist.every(term => term === "")) {
-  return { isValid: true, errors };
-}
+  if (
+    !Array.isArray(blocklist) ||
+    blocklist.length === 0 ||
+    blocklist.every((term) => term === "")
+  ) {
+    return { isValid: true, errors };
+  }
 
   // Preprocess blocklist into a Set for fast lookups
   const processedBlocklistSet = new Set(
@@ -52,13 +56,21 @@ if (!Array.isArray(blocklist) || blocklist.length === 0 || blocklist.every(term 
       return customDistanceCalculator(term, password);
     }
     return Math.max(
-      Math.min(Math.floor(getUtf8Length(term) * matchingSensitivity), maxEditDistance),
+      Math.min(
+        Math.floor(getUtf8Length(term) * matchingSensitivity),
+        maxEditDistance
+      ),
       0
     );
   };
 
   // Helper: Check if a password substring matches a blocklist term
   const isTermBlocked = (blockedWord: string): boolean => {
+    // Skip empty blocklist terms
+    if (blockedWord === "") {
+      return false;
+    }
+
     const fuzzyTolerance = calculateFuzzyTolerance(blockedWord);
 
     // Use Set for exact matching when bypassing fuzzy matching for short terms
@@ -66,8 +78,14 @@ if (!Array.isArray(blocklist) || blocklist.length === 0 || blocklist.every(term 
       return processedBlocklistSet.has(blockedWord.toLowerCase());
     }
 
-    for (let i = 0; i <= getUtf8Length(password) - getUtf8Length(blockedWord); i++) {
-      const substring = password.substring(i, i + getUtf8Length(blockedWord)).toLowerCase();
+    for (
+      let i = 0;
+      i <= getUtf8Length(password) - getUtf8Length(blockedWord);
+      i++
+    ) {
+      const substring = password
+        .substring(i, i + getUtf8Length(blockedWord))
+        .toLowerCase();
       const distance = levenshteinDistance(substring, blockedWord);
       if (distance <= fuzzyTolerance) {
         return true;
@@ -79,11 +97,10 @@ if (!Array.isArray(blocklist) || blocklist.length === 0 || blocklist.every(term 
   const matchingTerms = Array.from(processedBlocklistSet).filter((term) =>
     isTermBlocked(term)
   );
-  
+
   matchingTerms.forEach((term) => {
     errors.push(`Password contains a substring too similar to: "${term}".`);
   });
-   
 
   return { isValid: errors.length === 0, errors };
 }
