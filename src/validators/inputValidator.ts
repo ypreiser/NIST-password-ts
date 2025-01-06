@@ -87,5 +87,13 @@ export function validateInput(
     errors.push("Max tolerance must be greater than or equal to 0.");
   }
 
+  if (options.errorLimit && typeof options.errorLimit !== "number") {
+    errors.push("Error limit must be a number.");
+  }
+  if (options.errorLimit && options.errorLimit < 1) {
+    errors.push("Error limit must be greater than or equal to 1.");
+  }
+  
+
   return errors;
 }

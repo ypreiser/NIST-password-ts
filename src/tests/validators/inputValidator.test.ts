@@ -63,6 +63,11 @@ describe("Input Validator", () => {
     const result = validateInput("validPassword", options);
     expect(result).toEqual(["Max tolerance must be a number."]);
   });
+  it("should return an error if errorLimit is not a number", () => {
+    const options: ValidationOptions = { errorLimit: "5" as any };
+    const result = validateInput("validPassword", options);
+    expect(result).toEqual(["Error limit must be a number."]);
+  });
 
   it("should return an error if minTolerance is greater than maxTolerance", () => {
     const options: ValidationOptions = {
@@ -90,6 +95,13 @@ describe("Input Validator", () => {
       "Max tolerance must be greater than or equal to 0.",
     ]);
   });
+  it("should return an error if errorLimit is less than 1", () => {
+    const options: ValidationOptions = { errorLimit: -1 };
+    const result = validateInput("validPassword", options);
+    expect(result).toEqual([
+      "Error limit must be greater than or equal to 1.",
+    ]);
+  });
 
   it("should return no errors for valid input with tolerances", () => {
     const options: ValidationOptions = {
@@ -103,4 +115,5 @@ describe("Input Validator", () => {
     const result = validateInput("validPassword", options);
     expect(result).toEqual([]);
   });
+
 });

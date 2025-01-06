@@ -12,7 +12,7 @@ import { getUtf8Length } from "../utils/utf8Length";
  * @param {number} [options.maxEditDistance=5] - Maximum character differences allowed for fuzzy matches. Default is 5.
  * @param {function} [options.customDistanceCalculator] - Custom function to calculate edit distance.
  * @param {boolean} [options.trimWhitespace=true] - Whether to trim leading/trailing whitespace from blocklist terms. Default is true.
- * @returns {{ isValid: boolean, errors: string[] }} - The validation result with any errors.
+ * @returns {ValidationResult} - An object containing a boolean indicating validity and an array of error messages.
  */
 export function blocklistValidator(
   password: string,
@@ -27,6 +27,7 @@ export function blocklistValidator(
 ): { isValid: boolean; errors: string[] } {
   const {
     matchingSensitivity = 0.25,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     minEditDistance = 0,
     maxEditDistance = 5,
     customDistanceCalculator,
