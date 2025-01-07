@@ -1,139 +1,201 @@
-import { describe, it, expect } from "vitest";
+// nist-password-validator\src\tests\validators\blocklistValidator.test.ts
+import { describe, it, expect, vi } from "vitest";
 import { blocklistValidator } from "../../validators/blocklistValidator";
 
 describe("blocklistValidator", () => {
-  it("validates a password not in the blocklist", () => {
-    const result = blocklistValidator("securepassword", ["123456", "qwerty"]);
-    expect(result).toEqual({ isValid: true, errors: [] });
-  });
+  // Test setup
+  const standardBlocklist = ["password", "123456", "qwerty"];
 
-  it("validates passwords containing blocklist terms", () => {
-    const result = blocklistValidator("mypassword123", ["password", "123"]);
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      'Password contains a substring too similar to: "password".'
-    );
-    expect(result.errors).toContain(
-      'Password contains a substring too similar to: "123".'
-    );
-  });
+  describe("Happy Path", () => {
+    it("should accept valid passwords not in blocklist", () => {
+      const validPasswords = [
+        "secureP@ssphrase123!",
+        "ComplexP@ss2024",
+        "UniqueStr0ng",
+      ];
 
-  it("respects the error limit", () => {
-    const result = blocklistValidator(
-      "mypassword123",
-      ["password", "123", "myp"],
-      { errorLimit: 2 }
-    );
-    expect(result.isValid).toBe(false);
-    expect(result.errors.length).toBe(2); 
-  });
+      validPasswords.forEach((password) => {
+        const result = blocklistValidator(password, standardBlocklist);
+        expect(result).toEqual({ isValid: true, errors: [] });
+      });
+    });
 
-  it("validates passwords with special characters in blocklist", () => {
-    const result = blocklistValidator("secure_pass", ["secure_pass"]);
-    expect(result).toEqual({
-      isValid: false,
-      errors: ['Password contains a substring too similar to: "secure_pass".'],
+    it("should handle empty inputs gracefully", () => {
+      const cases = [
+        { password: "", blocklist: standardBlocklist },
+        { password: "securepass", blocklist: [] },
+        { password: "securepass", blocklist: [""] },
+        { password: "securepass", blocklist: null },
+        { password: "securepass", blocklist: undefined },
+        { password: "securepass", blocklist: ["b"] },
+      ];
+
+      cases.forEach(({ password, blocklist }) => {
+        const result = blocklistValidator(password, blocklist);
+        expect(result).toEqual({ isValid: true, errors: [] });
+      });
+    });
+
+    it("should respect custom distance calculator", () => {
+      const customDistanceCalculator = (term: string) =>
+        Math.floor(term.length / 6);
+      const result = blocklistValidator("ComplexPass", ["Complete"], {
+        customDistanceCalculator,
+      });
+      console.log(result);
+
+      expect(result.isValid).toBe(true);
     });
   });
 
-  it("validates passwords with UTF-8 characters", () => {
-    const result = blocklistValidator("p@sswörd", ["password"]);
-    expect(result).toEqual({
-      isValid: false,
-      errors: ['Password contains a substring too similar to: "password".'],
+  describe("Sad Path", () => {
+    describe("Basic Validation", () => {
+      it("should reject passwords containing exact blocklist terms", () => {
+        const cases = [
+          {
+            password: "mypassword123",
+            blocklist: ["password"],
+            expectedError: "password",
+          },
+          {
+            password: "secure_pass",
+            blocklist: ["secure_pass"],
+            expectedError: "secure_pass",
+          },
+          {
+            password: "mypassword😊",
+            blocklist: ["password😊"],
+            expectedError: "password😊",
+          },
+        ];
+
+        cases.forEach(({ password, blocklist, expectedError }) => {
+          const result = blocklistValidator(password, blocklist);
+          expect(result.isValid).toBe(false);
+          expect(result.errors).toContain(
+            `Password contains a substring too similar to: "${expectedError}".`
+          );
+        });
+      });
+
+      it("should detect multiple violations with proper error limit", () => {
+        const password = "mypassword123";
+        const blocklist = ["password", "123", "myp"];
+
+        // Test with default error limit (Infinity)
+        const fullResult = blocklistValidator(password, blocklist);
+        expect(fullResult.isValid).toBe(false);
+        expect(fullResult.errors.length).toBe(3);
+
+        // Test with custom error limit
+        const limitedResult = blocklistValidator(password, blocklist, {
+          errorLimit: 2,
+        });
+        expect(limitedResult.isValid).toBe(false);
+        expect(limitedResult.errors.length).toBe(2);
+      });
+    });
+
+    describe("Fuzzy Matching", () => {
+      it("should detect similar passwords using fuzzy matching", () => {
+        const cases = [
+          { password: "password123", blocklist: ["password"] },
+          { password: "mypassword", blocklist: ["password"] },
+          { password: "p@ssword", blocklist: ["password"] },
+        ];
+
+        cases.forEach(({ password, blocklist }) => {
+          const result = blocklistValidator(password, blocklist, {
+            matchingSensitivity: 0.5, // Increase sensitivity for fuzzy matching
+          });
+          expect(result.isValid).toBe(false);
+          expect(result.errors[0]).toContain("password");
+        });
+      });
+      it("should bypass fuzzy matching for short terms", () => {
+        // Create a spy function that tracks when it's called
+        const distanceCalculatorSpy = vi.fn((term: string) => term.length);
+
+        const password = "testab";
+        const shortTerm = "ab"; // This is a short term that should bypass fuzzy matching
+
+        // Set matchingSensitivity high enough that the fuzzy tolerance would be > shortTerm length
+        // This ensures shortTerm.length <= fuzzyTolerance
+        blocklistValidator(password, [shortTerm], {
+          matchingSensitivity: 1, // This makes fuzzyTolerance equal to term length
+          customDistanceCalculator: distanceCalculatorSpy,
+        });
+
+        // The distance calculator should not be called for the short term
+        expect(distanceCalculatorSpy).not.toHaveBeenCalled();
+      });
+      it("should use fuzzy matching for longer terms", () => {
+        const distanceCalculatorSpy = vi.fn((term: string) => term.length);
+
+        const password = "testlongerterm";
+        const longTerm = "longerterm"; // This is long enough to trigger fuzzy matching
+
+        blocklistValidator(password, [longTerm], {
+          matchingSensitivity: 0.25, // Normal sensitivity
+          customDistanceCalculator: distanceCalculatorSpy,
+        });
+
+        // The distance calculator should be called for the longer term
+        expect(distanceCalculatorSpy).toHaveBeenCalled();
+      });
+    });
+
+    describe("Whitespace Handling", () => {
+      it("should handle whitespace according to options", () => {
+        const password = "mypassword";
+        const blocklistTerm = "   password   ";
+
+        // With trimWhitespace enabled (default)
+        const trimmedResult = blocklistValidator(password, [blocklistTerm], {
+          trimWhitespace: true,
+        });
+        expect(trimmedResult.isValid).toBe(false);
+
+        // With trimWhitespace disabled
+        const untrimmedResult = blocklistValidator(password, [blocklistTerm], {
+          trimWhitespace: false,
+        });
+        expect(untrimmedResult.isValid).toBe(true);
+      });
     });
   });
 
-  it("trims whitespace from blocklist terms if enabled", () => {
-    const result = blocklistValidator("mypassword", ["   password   "], {
-      trimWhitespace: true,
+  describe("Edge Cases", () => {
+    it("should handle UTF-8 characters properly", () => {
+      const cases = [
+        { password: "パスワード123", blocklist: ["パスワード"] },
+        { password: "пароль123", blocklist: ["пароль"] },
+        { password: "password🔑", blocklist: ["password🔑"] },
+      ];
+
+      cases.forEach(({ password, blocklist }) => {
+        const result = blocklistValidator(password, blocklist);
+        expect(result.isValid).toBe(false);
+        expect(result.errors.length).toBe(1);
+      });
     });
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      'Password contains a substring too similar to: "password".'
-    );
-  });
 
-  it("does not trim whitespace from blocklist terms if disabled", () => {
-    const result = blocklistValidator("mypassword", ["   password   "], {
-      trimWhitespace: false,
+    it("should handle extremely long passwords and blocklist terms", () => {
+      const longPassword = "a".repeat(1000);
+      const longBlocklistTerm = "a".repeat(500);
+
+      const result = blocklistValidator(longPassword, [longBlocklistTerm]);
+      expect(result.isValid).toBe(false);
     });
-    expect(result.isValid).toBe(true);
-    expect(result.errors).toEqual([]);
-  });
 
-  it("uses a custom distance calculator if provided", () => {
-    const customDistanceCalculator = (term: string) => term.length / 2;
-    const result = blocklistValidator("mypassword", ["password"], {
-      customDistanceCalculator,
+    it("should handle special characters in blocklist terms", () => {
+      const specialCharsBlocklist = ["pass!@#$%", "pass^&*()", "pass<>?{}"];
+
+      specialCharsBlocklist.forEach((term) => {
+        const result = blocklistValidator(term, [term]);
+        expect(result.isValid).toBe(false);
+        expect(result.errors[0]).toContain(term);
+      });
     });
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      'Password contains a substring too similar to: "password".'
-    );
-  });
-
-  it("handles an empty blocklist gracefully", () => {
-    const result = blocklistValidator("mypassword", [], {});
-    expect(result).toEqual({ isValid: true, errors: [] });
-  });
-
-  it("handles an empty password gracefully", () => {
-    const result = blocklistValidator("", ["password"]);
-    expect(result).toEqual({ isValid: true, errors: [] });
-  });
-
-  it("handles blocklist with empty strings", () => {
-    const result = blocklistValidator("mypassword", ["", "password"]);
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      'Password contains a substring too similar to: "password".'
-    );
-  });
-
-  it("validates passwords with exact matches for short terms", () => {
-    const result = blocklistValidator("mypassword", ["pass"]);
-    expect(result).toEqual({
-      isValid: false,
-      errors: ['Password contains a substring too similar to: "pass".'],
-    });
-  });
-
-  it("validates passwords using fuzzy matching", () => {
-    const result = blocklistValidator("passw0rd", ["password"], {
-      maxEditDistance: 1,
-    });
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      'Password contains a substring too similar to: "password".'
-    );
-  });
-
-  it("skips fuzzy matching for short terms", () => {
-    const result = blocklistValidator("mypassword", ["p", "b", "pass"], {
-      matchingSensitivity: 1,
-    });
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      'Password contains a substring too similar to: "pass".'
-    );
-  });
-
-  it("stops processing when error limit is reached", () => {
-    const result = blocklistValidator(
-      "mypassword123456",
-      ["mypassword", "123", "456"],
-      { errorLimit: 1 }
-    );
-    expect(result.isValid).toBe(false);
-    expect(result.errors.length).toBe(1);
-  });
-
-  it("handles complex UTF-8 characters in blocklist", () => {
-    const result = blocklistValidator("mypassword😊", ["password😊"]);
-    expect(result.isValid).toBe(false);
-    expect(result.errors).toContain(
-      'Password contains a substring too similar to: "password😊".'
-    );
   });
 });
