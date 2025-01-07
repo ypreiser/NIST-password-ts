@@ -44,14 +44,6 @@ async function validatePassword(
     return { isValid: false, errors };
   }
 
-  // Check for maximum length error
-  if (options.maxLength && password.length > options.maxLength) {
-    addErrors([`Password must be at most ${options.maxLength} characters.`]);
-    if (errors.length >= errorLimit) {
-      return { isValid: false, errors };
-    }
-  }
-
   // Blocklist validation
   if (options.blocklist) {
     const blocklistResult = blocklistValidator(password, options.blocklist, {
@@ -60,6 +52,7 @@ async function validatePassword(
       minEditDistance: options.minEditDistance,
       maxEditDistance: options.maxEditDistance,
       customDistanceCalculator: options.customDistanceCalculator,
+      errorLimit: errorLimit - errors.length, // Adjust error limit based on current errors
     });
     addErrors(blocklistResult.errors);
     if (errors.length >= errorLimit) {
@@ -71,9 +64,6 @@ async function validatePassword(
   if (options.hibpCheck !== false) {
     const hibpResult = await hibpValidator(password);
     addErrors(hibpResult.errors);
-    if (errors.length >= errorLimit) {
-      return { isValid: false, errors };
-    }
   }
 
   return { isValid: errors.length === 0, errors };

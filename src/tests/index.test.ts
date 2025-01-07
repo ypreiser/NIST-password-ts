@@ -56,7 +56,7 @@ describe("Password Validation", () => {
       maxLength: 15,
     });
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain("Password must be at most 15 characters.");
+    expect(result.errors).toContain("Password must not exceed 15 characters.");
   });
 
   it("should use default options when none are provided", async () => {
@@ -220,13 +220,14 @@ describe("Password Validation", () => {
     ]);
   });
   it("should stop validating at errorLimit ", async () => {
-    const result = await validatePassword("123456!", {
-      blocklist: ["123456", "!"],
+    const result = await validatePassword("123456!password", {
+      blocklist: ["123456", "!", "password", "d"],
       minLength: 6,
       hibpCheck: true,
       errorLimit: 2,
     });
     expect(result.isValid).toBe(false);
+    expect(result.errors.length).toBe(2);
     expect(result.errors).toEqual([
       'Password contains a substring too similar to: "123456".',
       'Password contains a substring too similar to: "!".',
@@ -298,6 +299,19 @@ describe("Password Validation", () => {
     expect(result.errors).toHaveLength(1);
     expect(result.errors).toContain("Password must not exceed 15 characters.");
   });
+  it("should stop validation after blocklist check if error limit reached", async () => {
+    const result = await validatePassword("password", {
+      minLength: 8,
+      blocklist: ["password"],
+      hibpCheck: true,
+      errorLimit: 1,
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors).toContain(
+      'Password contains a substring too similar to: "password".'
+    );
+  });
 
   it("should stop validation after length validation with multiple errors if error limit allows", async () => {
     const result = await validatePassword("short", {
@@ -305,10 +319,10 @@ describe("Password Validation", () => {
       maxLength: 10,
       blocklist: ["password"],
       hibpCheck: true,
-      errorLimit: 2,
+      errorLimit: 1,
     });
     expect(result.isValid).toBe(false);
-    expect(result.errors).toHaveLength(1); // Only length error since it's too short
+    expect(result.errors).toHaveLength(1);
     expect(result.errors).toContain("Password must be at least 8 characters.");
   });
 

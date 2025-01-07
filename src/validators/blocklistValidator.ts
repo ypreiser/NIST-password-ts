@@ -12,6 +12,7 @@ import { getUtf8Length } from "../utils/utf8Length";
  * @param {number} [options.maxEditDistance=5] - Maximum character differences allowed for fuzzy matches. Default is 5.
  * @param {function} [options.customDistanceCalculator] - Custom function to calculate edit distance.
  * @param {boolean} [options.trimWhitespace=true] - Whether to trim leading/trailing whitespace from blocklist terms. Default is true.
+ * @param {number} [options.errorLimit=Infinity] - Maximum number of errors to report. Default is Infinity.
  * @returns {ValidationResult} - An object containing a boolean indicating validity and an array of error messages.
  */
 export function blocklistValidator(
@@ -23,6 +24,7 @@ export function blocklistValidator(
     maxEditDistance?: number;
     customDistanceCalculator?: (term: string, password: string) => number;
     trimWhitespace?: boolean;
+    errorLimit?: number;
   } = {}
 ): { isValid: boolean; errors: string[] } {
   const {
@@ -32,6 +34,7 @@ export function blocklistValidator(
     maxEditDistance = 5,
     customDistanceCalculator,
     trimWhitespace = true,
+    errorLimit = Infinity,
   } = options;
 
   const errors: string[] = [];
@@ -93,13 +96,15 @@ export function blocklistValidator(
     return false;
   };
 
-  const matchingTerms = Array.from(processedBlocklistSet).filter((term) =>
-    isTermBlocked(term)
-  );
-
-  matchingTerms.forEach((term) => {
-    errors.push(`Password contains a substring too similar to: "${term}".`);
-  });
+  // Validate against blocklist with early exit on error limit
+  for (const term of processedBlocklistSet) {
+    if (isTermBlocked(term)) {
+      errors.push(`Password contains a substring too similar to: "${term}".`);
+      if (errors.length >= errorLimit) {
+        break; // Stop further checks when error limit is reached
+      }
+    }
+  }
 
   return { isValid: errors.length === 0, errors };
 }
