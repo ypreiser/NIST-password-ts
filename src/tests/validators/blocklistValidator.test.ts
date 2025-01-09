@@ -1,6 +1,7 @@
 // nist-password-validator\src\tests\validators\blocklistValidator.test.ts
 import { describe, it, expect, vi } from "vitest";
 import { blocklistValidator } from "../../validators/blocklistValidator";
+import * as levenshteinModule from "../../utils/levenshteinDistance";
 
 describe("blocklistValidator", () => {
   // Test setup
@@ -113,37 +114,6 @@ describe("blocklistValidator", () => {
         });
       });
     });
-    it("should bypass fuzzy matching for short terms", () => {
-      // Create a spy function that tracks when it's called
-      const distanceCalculatorSpy = vi.fn((term: string) => term.length);
-
-      const password = "testab";
-      const shortTerm = "a"; // This is a short term that should bypass fuzzy matching
-
-      // Set matchingSensitivity high enough that the fuzzy tolerance would be > shortTerm length
-      // This ensures shortTerm.length <= fuzzyTolerance
-      blocklistValidator(password, [shortTerm], {
-        // matchingSensitivity: 1, // This makes fuzzyTolerance equal to term length
-        customDistanceCalculator: distanceCalculatorSpy,
-      });
-
-      // The distance calculator should not be called for the short term
-      expect(distanceCalculatorSpy).not.toHaveBeenCalled();
-    });
-    it("should use fuzzy matching for longer terms", () => {
-      const distanceCalculatorSpy = vi.fn((term: string) => term.length);
-
-      const password = "testlongerterm";
-      const longTerm = "longerterm"; // This is long enough to trigger fuzzy matching
-
-      blocklistValidator(password, [longTerm], {
-        matchingSensitivity: 0.25, // Normal sensitivity
-        customDistanceCalculator: distanceCalculatorSpy,
-      });
-
-      // The distance calculator should be called for the longer term
-      expect(distanceCalculatorSpy).toHaveBeenCalled();
-    });
 
     describe("Whitespace Handling", () => {
       it("should handle whitespace according to options", () => {
@@ -166,6 +136,32 @@ describe("blocklistValidator", () => {
   });
 
   describe("Edge Cases", () => {
+    it("should bypass fuzzy matching for short terms", () => {
+      const levenshteinSpy = vi.spyOn(levenshteinModule, "default");
+
+      const password = "testab";
+      const shortTerm = "ab";
+
+      blocklistValidator(password, [shortTerm], {
+        matchingSensitivity: 1,
+      });
+
+      expect(levenshteinSpy).not.toHaveBeenCalled();
+    });
+
+    it("should use fuzzy matching for longer terms", () => {
+      const levenshteinSpy = vi.spyOn(levenshteinModule, "default");
+
+      const password = "testlongerterm";
+      const longTerm = "longerterm";
+
+      blocklistValidator(password, [longTerm], {
+        matchingSensitivity: 0.25,
+      });
+
+      expect(levenshteinSpy).toHaveBeenCalled();
+    });
+
     it("should handle UTF-8 characters properly", () => {
       const cases = [
         { password: "パスワード123", blocklist: ["パスワード"] },
