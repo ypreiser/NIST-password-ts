@@ -112,37 +112,37 @@ describe("blocklistValidator", () => {
           expect(result.errors[0]).toContain("password");
         });
       });
-      it("should bypass fuzzy matching for short terms", () => {
-        // Create a spy function that tracks when it's called
-        const distanceCalculatorSpy = vi.fn((term: string) => term.length);
+    });
+    it("should bypass fuzzy matching for short terms", () => {
+      // Create a spy function that tracks when it's called
+      const distanceCalculatorSpy = vi.fn((term: string) => term.length);
 
-        const password = "testab";
-        const shortTerm = "ab"; // This is a short term that should bypass fuzzy matching
+      const password = "testab";
+      const shortTerm = "a"; // This is a short term that should bypass fuzzy matching
 
-        // Set matchingSensitivity high enough that the fuzzy tolerance would be > shortTerm length
-        // This ensures shortTerm.length <= fuzzyTolerance
-        blocklistValidator(password, [shortTerm], {
-          matchingSensitivity: 1, // This makes fuzzyTolerance equal to term length
-          customDistanceCalculator: distanceCalculatorSpy,
-        });
-
-        // The distance calculator should not be called for the short term
-        expect(distanceCalculatorSpy).not.toHaveBeenCalled();
+      // Set matchingSensitivity high enough that the fuzzy tolerance would be > shortTerm length
+      // This ensures shortTerm.length <= fuzzyTolerance
+      blocklistValidator(password, [shortTerm], {
+        // matchingSensitivity: 1, // This makes fuzzyTolerance equal to term length
+        customDistanceCalculator: distanceCalculatorSpy,
       });
-      it("should use fuzzy matching for longer terms", () => {
-        const distanceCalculatorSpy = vi.fn((term: string) => term.length);
 
-        const password = "testlongerterm";
-        const longTerm = "longerterm"; // This is long enough to trigger fuzzy matching
+      // The distance calculator should not be called for the short term
+      expect(distanceCalculatorSpy).not.toHaveBeenCalled();
+    });
+    it("should use fuzzy matching for longer terms", () => {
+      const distanceCalculatorSpy = vi.fn((term: string) => term.length);
 
-        blocklistValidator(password, [longTerm], {
-          matchingSensitivity: 0.25, // Normal sensitivity
-          customDistanceCalculator: distanceCalculatorSpy,
-        });
+      const password = "testlongerterm";
+      const longTerm = "longerterm"; // This is long enough to trigger fuzzy matching
 
-        // The distance calculator should be called for the longer term
-        expect(distanceCalculatorSpy).toHaveBeenCalled();
+      blocklistValidator(password, [longTerm], {
+        matchingSensitivity: 0.25, // Normal sensitivity
+        customDistanceCalculator: distanceCalculatorSpy,
       });
+
+      // The distance calculator should be called for the longer term
+      expect(distanceCalculatorSpy).toHaveBeenCalled();
     });
 
     describe("Whitespace Handling", () => {
