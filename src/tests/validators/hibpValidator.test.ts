@@ -1,17 +1,13 @@
-// src\tests\validators\hibpValidator.test.ts
-import { hibpValidator } from '../../validators/hibpValidator';
+import { hibpValidator, generateSHA1 } from '../../validators/hibpValidator';
 import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest';
+import type { ValidationResult } from "../../types";
 
-// Helper function to generate SHA-1 hash for test passwords
-async function generateSHA1(password: string) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest("SHA-1", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => (b < 16 ? "0" : "") + b.toString(16)).join("").toUpperCase();
-}
+describe('HIBP Password Validator', () => {
+  // Test utilities
+  const mockFetch = (response: Partial<Response>) => {
+    global.fetch = vi.fn().mockResolvedValueOnce(response as Response);
+  };
 
-describe('hibpValidator', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
   });
@@ -20,58 +16,145 @@ describe('hibpValidator', () => {
     vi.restoreAllMocks();
   });
 
-  it('validates a password not in the HIBP database', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      text: async () => 'ABCDE:2\n12345:3', // Example hash ranges with no match
-    } as Response);
+  describe('Happy Path', () => {
+    it('should validate a password not found in breaches', async () => {
+      mockFetch({
+        ok: true,
+        text: async () => 'ABCDE:2\nFGHIJ:3',
+      });
 
-    const result = await hibpValidator('uniquePassword123');
-    expect(result).toEqual({ isValid: true, errors: [] });
+      const result = await hibpValidator('SecurePass123!');
+      expect(result).toEqual<ValidationResult>({ 
+        isValid: true, 
+        errors: [] 
+      });
+    });
+
+    it('should handle empty response from API correctly', async () => {
+      mockFetch({
+        ok: true,
+        text: async () => '',
+      });
+
+      const result = await hibpValidator('AnotherSecurePass456!');
+      expect(result).toEqual<ValidationResult>({ 
+        isValid: true, 
+        errors: [] 
+      });
+    });
+
+    it('should correctly identify a breached password', async () => {
+      const password = 'password123';
+      const sha1 = await generateSHA1(password);
+      const suffix = sha1.substring(5);
+
+      mockFetch({
+        ok: true,
+        text: async () => `${suffix}:1337\nOTHERHASH:42`,
+      });
+
+      const result = await hibpValidator(password);
+      expect(result).toEqual<ValidationResult>({ 
+        isValid: false, 
+        errors: ['Password has been compromised in a data breach.'] 
+      });
+    });
   });
 
-  it('returns error for password in the HIBP database', async () => {
-    // Generate SHA-1 for "password"
-    const sha1 = await generateSHA1('password');
-    const suffix = sha1.substring(5);    // Remaining characters
+  describe('Sad Path', () => {
+    it('should handle API error responses with detailed error message', async () => {
+      mockFetch({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        text: async () => 'Service temporarily unavailable',
+      });
 
-    // Mock fetch to return a response containing the matching suffix
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      text: async () => `${suffix.toUpperCase()}:1\nOTHERHASH:2`, // Matching suffix included
-    } as Response);
+      await expect(hibpValidator('password123')).rejects.toThrow(
+        'HaveIBeenPwned check failed: Failed to check password against HaveIBeenPwned API. Status: 500, Details: Service temporarily unavailable'
+      );
+    });
 
-    const result = await hibpValidator('password');
-    expect(result).toEqual({ isValid: false, errors: ['Password has been compromised in a data breach.'] });
+    it('should handle network failures gracefully', async () => {
+      global.fetch = vi.fn().mockRejectedValueOnce(
+        new Error('Network connection failed')
+      );
+
+      await expect(hibpValidator('password123')).rejects.toThrow(
+        'HaveIBeenPwned check failed: Network connection failed'
+      );
+    });
+
+    it('should handle malformed API responses', async () => {
+      mockFetch({
+        ok: true,
+        text: async () => 'INVALID:FORMAT:EXTRA:COLONS',
+      });
+
+      const result = await hibpValidator('password123');
+      expect(result).toEqual<ValidationResult>({ 
+        isValid: true, 
+        errors: [] 
+      });
+    });
+
+    it('should handle API rate limiting', async () => {
+      mockFetch({
+        ok: false,
+        status: 429,
+        statusText: 'Too Many Requests',
+        text: async () => 'Rate limit exceeded',
+      });
+
+      await expect(hibpValidator('password123')).rejects.toThrow(
+        'HaveIBeenPwned check failed: Failed to check password against HaveIBeenPwned API. Status: 429, Details: Rate limit exceeded'
+      );
+    });
   });
 
-  it('handles non-200 API responses gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      statusText: 'Internal Server Error',
-      text: async () => 'Error details', // Add details for better error logging
-    } as Response);
+  describe('Edge Cases', () => {
+    it('should handle passwords with special characters correctly', async () => {
+      mockFetch({
+        ok: true,
+        text: async () => 'ABCDE:0',
+      });
 
-    await expect(hibpValidator('password')).rejects.toThrow(
-      'HaveIBeenPwned check failed: Failed to check password against HaveIBeenPwned API. Status: 500, Details: Error details'
-    );
-  });
+      const result = await hibpValidator('!@#$%^&*()_+{}:"<>?😀');
+      expect(result).toEqual<ValidationResult>({ 
+        isValid: true, 
+        errors: [] 
+      });
+    });
 
-  it('throws an error for network issues or invalid responses', async () => {
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
+    it('should handle extremely long passwords', async () => {
+      const longPassword = 'a'.repeat(1000);
+      mockFetch({
+        ok: true,
+        text: async () => 'ABCDE:0',
+      });
 
-    await expect(hibpValidator('password')).rejects.toThrow('HaveIBeenPwned check failed: Network error');
-  });
+      const result = await hibpValidator(longPassword);
+      expect(result).toEqual<ValidationResult>({ 
+        isValid: true, 
+        errors: [] 
+      });
+    });
 
-  // New test for handling unexpected response formats
-  it('throws an error for unexpected response format', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      text: async () => 'Unexpected format', // Simulate unexpected response
-    } as Response);
+    it('should handle passwords with zero occurrences in breaches', async () => {
+      const password = 'UniquePassword123!';
+      const sha1 = await generateSHA1(password);
+      const suffix = sha1.substring(5);
 
-    const result = await hibpValidator('unexpectedPassword');
-    expect(result).toEqual({ isValid: true, errors: [] }); // Assuming it defaults to valid
+      mockFetch({
+        ok: true,
+        text: async () => `${suffix}:0\nOTHERHASH:42`,
+      });
+
+      const result = await hibpValidator(password);
+      expect(result).toEqual<ValidationResult>({ 
+        isValid: true, 
+        errors: [] 
+      });
+    });
   });
 });
