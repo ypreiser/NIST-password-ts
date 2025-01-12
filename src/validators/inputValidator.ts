@@ -32,12 +32,27 @@ export function validateInput(
   }
 
   // Validate options
-  if (options.minLength && typeof options.minLength !== "number") {
-    errors.push("Minimum length must be a number.");
+  if (
+    options.minLength &&
+    (typeof options.minLength !== "number" ||
+    options.minLength < 1)
+  ) {
+    errors.push("Minimum length must be a positive number.");
   }
 
-  if (options.maxLength && typeof options.maxLength !== "number") {
-    errors.push("Maximum length must be a number.");
+  if (
+    options.maxLength &&
+    (typeof options.maxLength !== "number" ||
+    options.maxLength < 1)
+  ) {
+    errors.push("Maximum length must be a positive number.");
+  }
+  if (
+    options.minLength &&
+    options.maxLength &&
+    options.minLength > options.maxLength
+  ) {
+    errors.push("Minimum length cannot be greater than maximum length.");
   }
 
   if (options.blocklist) {
@@ -85,6 +100,13 @@ export function validateInput(
 
   if (options.maxEditDistance && options.maxEditDistance < 0) {
     errors.push("Max tolerance must be greater than or equal to 0.");
+  }
+
+  if (options.errorLimit && typeof options.errorLimit !== "number") {
+    errors.push("Error limit must be a number.");
+  }
+  if (options.errorLimit !== undefined && options.errorLimit < 1) {
+    errors.push("Error limit must be greater than or equal to 1.");
   }
 
   return errors;

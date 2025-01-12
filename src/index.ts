@@ -8,16 +8,27 @@ import { ValidationOptions, ValidationResult } from "./types";
 /**
  * Validates a password against various criteria including length, blocklist, and breach checks.
  * @param {string} password - The password to validate.
- * @param {ValidationOptions} [options={}] - The validation options including minLength, maxLength, blocklist, scaling factors, and HIBP check settings.
+ * @param {ValidationOptions} [options={}] - The validation options including minLength, maxLength, blocklist, scaling factors, HIBP check settings, and error limit.
  * @returns {Promise<ValidationResult>} - A promise that resolves to an object containing a boolean indicating validity and an array of error messages.
  */
 async function validatePassword(
   password: string,
   options: ValidationOptions = {}
 ): Promise<ValidationResult> {
-  const errors: string[] = validateInput(password, options);
+  const errors: string[] = [];
+  const { errorLimit = Infinity } = options; // Default: No limit
 
-  if (errors.length > 0) {
+  // Helper to manage error limit
+  const addErrors = (newErrors: string[]) => {
+    const remainingLimit = errorLimit - errors.length;
+      errors.push(...newErrors.slice(0, remainingLimit));
+
+  };
+
+  // Input validation
+  const inputErrors = validateInput(password, options);
+  addErrors(inputErrors);
+  if (errors.length >= errorLimit) {
     return { isValid: false, errors };
   }
 
@@ -27,11 +38,9 @@ async function validatePassword(
     options.minLength,
     options.maxLength
   );
-  errors.push(...lengthResult.errors);
-
-  // Check for maximum length error
-  if (options.maxLength && password.length > options.maxLength) {
-    errors.push(`Password must be at most ${options.maxLength} characters.`);
+  addErrors(lengthResult.errors);
+  if (errors.length >= errorLimit) {
+    return { isValid: false, errors };
   }
 
   // Blocklist validation
@@ -42,14 +51,18 @@ async function validatePassword(
       minEditDistance: options.minEditDistance,
       maxEditDistance: options.maxEditDistance,
       customDistanceCalculator: options.customDistanceCalculator,
+      errorLimit: errorLimit - errors.length, // Adjust error limit based on current errors
     });
-    errors.push(...blocklistResult.errors);
+    addErrors(blocklistResult.errors);
+    if (errors.length >= errorLimit) {
+      return { isValid: false, errors };
+    }
   }
 
   // HIBP validation
   if (options.hibpCheck !== false) {
     const hibpResult = await hibpValidator(password);
-    errors.push(...hibpResult.errors);
+    addErrors(hibpResult.errors);
   }
 
   return { isValid: errors.length === 0, errors };

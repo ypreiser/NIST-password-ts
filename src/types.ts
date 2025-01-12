@@ -13,6 +13,7 @@ export type ValidationOptions = {
   hibpCheck?: boolean; // Flag to enable or disable HIBP breach checks
   customDistanceCalculator?: (term: string, password: string) => number; // Custom function for tolerance calculation
   trimWhitespace?: boolean; // Default: true - Flag to enable or disable trimming of whitespace from password and blocklist terms
+  errorLimit?: number
 };
 
 /**
