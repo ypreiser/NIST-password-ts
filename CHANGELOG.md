@@ -1,10 +1,26 @@
+Here’s the updated changelog with the `errorLimit` feature added:
+
+---
+
 # Changelog
 
 All notable changes to this project are documented here.
 
+---
+
+## [2.1.0] - 2025-01-12
+### Added
+- Introduced the `errorLimit` feature to control the maximum number of validation errors returned, improving feedback clarity and performance.
+- Updated README to include detailed documentation and examples for the `errorLimit` option.
+
+### Fixed
+- Negative length option handling.
+
+---
+
 ## [2.0.2] - 2025-01-06
 ### Fixed
-- empty string handling in blocklist
+- Empty string handling in blocklist.
 
 ---
 
@@ -14,7 +30,7 @@ All notable changes to this project are documented here.
 - Added a detailed example to the README for customizing the blocklist with personal information.
 
 ### Fixed
-- Disabled minEditDistance to prevent false positives caused by short blocklist terms.
+- Disabled `minEditDistance` to prevent false positives caused by short blocklist terms.
 - Updated the README for better clarity and usage details.
 - Adjusted the Levenshtein Distance algorithm to better handle UTF-8 characters.
 
@@ -27,18 +43,16 @@ All notable changes to this project are documented here.
 
 ### Added
 - New blocklist validation configuration options:
-  - `matchingSensitivity` 
+  - `matchingSensitivity`
   - `minEditDistance`
   - `maxEditDistance`
   - `customDistanceCalculator`
   - `trimWhitespace`
 - Comprehensive documentation and examples for the new matching system.
 - Improved handling of Unicode characters for blocklist validation.
-
-- Optional whitespace trimming for passwords and blocklist terms
-  - Enabled by default (NIST recommendation)
-  - Configurable via `trimWhitespace` option
-
+- Optional whitespace trimming for passwords and blocklist terms:
+  - Enabled by default (NIST recommendation).
+  - Configurable via the `trimWhitespace` option.
 
 ### Fixed
 - Resolved an issue where short blocklist terms caused excessive false positives.
@@ -100,3 +114,4 @@ Users upgrading from `1.x.x` to `2.0.0` should:
 ### Changed
 - Renamed the library file from `nist-password-validator.js` to `nist-password-validator`.
 
+---
