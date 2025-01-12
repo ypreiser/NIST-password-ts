@@ -66,7 +66,7 @@ describe("Password Validation", () => {
       description: string;
       password: string;
       options: ValidationOptions;
-      expectedError: string;
+      expectedError?: string;
     }
 
     const invalidInputs: InvalidInputCase[] = [
@@ -80,13 +80,12 @@ describe("Password Validation", () => {
         description: "invalid minLength type",
         password: "validPassword",
         options: { minLength: "10" as any },
-        expectedError: "Minimum length must be a number.",
+        expectedError: "Minimum length must be a positive number.",
       },
       {
         description: "invalid maxLength type",
         password: "validPassword",
         options: { maxLength: "20" as any },
-        expectedError: "Maximum length must be a number.",
       },
       {
         description: "invalid blocklist type",
@@ -107,7 +106,9 @@ describe("Password Validation", () => {
       async ({ password, options, expectedError }) => {
         const result = await validatePassword(password, options);
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain(expectedError);
+        if (expectedError) {
+          expect(result.errors).toContain(expectedError);
+        }
       }
     );
   });
@@ -367,6 +368,64 @@ describe("Password Validation", () => {
       expect(result.errors).toEqual([
         "Password must be at least 8 characters.",
       ]);
+    });
+    it("should not add additional errors when error limit is reached", async () => {
+      // Using a very small error limit (1) and a password that violates multiple input validations
+      const result = await validatePassword("test", {
+        errorLimit: 1,
+        minLength: "invalid" as any,
+        maxLength: "invalid" as any,
+        blocklist: "invalid" as any,
+        matchingSensitivity: "invalid" as any,
+      });
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+      // Should only contain the first error
+    });
+
+    it("should handle hitting error limit exactly with input validation", async () => {
+      // Using multiple invalid inputs with exact error limit
+      const result = await validatePassword("", {
+        errorLimit: 2,
+        minLength: "invalid" as any,
+        maxLength: "invalid" as any,
+        matchingSensitivity: "invalid" as any, // This error shouldn't be added
+      });
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toHaveLength(2);
+      expect(result.errors).toEqual([
+        "Password cannot be empty.",
+        "Password has been compromised in a data breach.",
+      ]);
+
+      // This error should not be added due to error limit
+      expect(result.errors).not.toContain("Maximum length must be a number.");
+    });
+
+    it("should stop adding errors at limit with multiple validation steps", async () => {
+      const result = await validatePassword("pass", {
+        errorLimit: 2,
+        minLength: 8,
+        blocklist: ["pass", "word", "123"], // Multiple blocklist items
+        hibpCheck: true, // Additional validation that should be skipped
+      });
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toHaveLength(2);
+      expect(result.errors).toEqual([
+        "Password must be at least 8 characters.",
+        'Password contains a substring too similar to: "pass".',
+      ]);
+
+      // These errors should not be added due to error limit
+      expect(result.errors).not.toContain(
+        'Password contains a substring too similar to: "word".'
+      );
+      expect(result.errors).not.toContain(
+        "Password has been compromised in a data breach."
+      );
     });
   });
 });

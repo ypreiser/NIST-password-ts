@@ -4,7 +4,9 @@ import type { ValidationOptions } from "../../types";
 
 describe("Input Validator", () => {
   // Test utilities
-  const createOptions = (overrides?: Partial<ValidationOptions>): ValidationOptions => ({
+  const createOptions = (
+    overrides?: Partial<ValidationOptions>
+  ): ValidationOptions => ({
     minLength: 8,
     maxLength: 64,
     blocklist: [],
@@ -12,7 +14,7 @@ describe("Input Validator", () => {
     maxEditDistance: 4,
     matchingSensitivity: 0.3,
     errorLimit: 1,
-    ...overrides
+    ...overrides,
   });
 
   describe("Happy Path", () => {
@@ -66,13 +68,33 @@ describe("Input Validator", () => {
     it("should reject invalid minLength type", () => {
       const options = createOptions({ minLength: "15" as any });
       const result = validateInput("validPassword", options);
-      expect(result).toEqual(["Minimum length must be a number."]);
+      expect(result).toEqual(["Minimum length must be a positive number."]);
     });
 
     it("should reject invalid maxLength type", () => {
       const options = createOptions({ maxLength: "64" as any });
       const result = validateInput("validPassword", options);
-      expect(result).toEqual(["Maximum length must be a number."]);
+      expect(result).toEqual(["Maximum length must be a positive number."]);
+    });
+    it("should reject negative minLength", () => {
+      const options = createOptions({ minLength: -5 });
+      const result = validateInput("validPassword", options);
+      expect(result).toEqual(["Minimum length must be a positive number."]);
+    });
+    it("should reject negative maxLength", () => {
+      const options = createOptions({ maxLength: -5, minLength: -10 });
+      const result = validateInput("validPassword", options);
+      expect(result).toEqual([
+        "Minimum length must be a positive number.",
+        "Maximum length must be a positive number.",
+      ]);
+    });
+    it("should reject minLength greater than maxLength", () => {
+      const options = createOptions({ minLength: 10, maxLength: 5 });
+      const result = validateInput("validPassword", options);
+      expect(result).toEqual([
+        "Minimum length cannot be greater than maximum length.",
+      ]);
     });
   });
 
@@ -92,7 +114,7 @@ describe("Input Validator", () => {
     it("should trim blocklist items when trimming is enabled", () => {
       const options = createOptions({
         blocklist: [" password ", " admin "],
-        trimWhitespace: true
+        trimWhitespace: true,
       });
       const result = validateInput("validPassword", options);
       expect(result).toEqual([]);
@@ -135,22 +157,28 @@ describe("Input Validator", () => {
     it("should reject negative minEditDistance", () => {
       const options = createOptions({ minEditDistance: -1 });
       const result = validateInput("validPassword", options);
-      expect(result).toEqual(["Min tolerance must be greater than or equal to 0."]);
+      expect(result).toEqual([
+        "Min tolerance must be greater than or equal to 0.",
+      ]);
     });
 
     it("should reject negative maxEditDistance", () => {
       const options = createOptions({ maxEditDistance: -1 });
       const result = validateInput("validPassword", options);
-      expect(result).toEqual(["Max tolerance must be greater than or equal to 0."]);
+      expect(result).toEqual([
+        "Max tolerance must be greater than or equal to 0.",
+      ]);
     });
 
     it("should reject minEditDistance greater than maxEditDistance", () => {
       const options = createOptions({
         minEditDistance: 5,
-        maxEditDistance: 3
+        maxEditDistance: 3,
       });
       const result = validateInput("validPassword", options);
-      expect(result).toEqual(["Min tolerance cannot be greater than maximum tolerance."]);
+      expect(result).toEqual([
+        "Min tolerance cannot be greater than maximum tolerance.",
+      ]);
     });
   });
 
@@ -167,8 +195,9 @@ describe("Input Validator", () => {
       console.log(result);
       console.log(options);
 
-      
-      expect(result).toEqual(["Error limit must be greater than or equal to 1."]);
+      expect(result).toEqual([
+        "Error limit must be greater than or equal to 1.",
+      ]);
     });
 
     it("should accept valid errorLimit", () => {
@@ -198,10 +227,12 @@ describe("Input Validator", () => {
       const options = createOptions({
         minEditDistance: -1,
         maxEditDistance: "invalid" as any,
-        matchingSensitivity: 1.5
+        matchingSensitivity: 1.5,
       });
       const result = validateInput("validPassword", options);
-      expect(result).toContain("Min tolerance must be greater than or equal to 0.");
+      expect(result).toContain(
+        "Min tolerance must be greater than or equal to 0."
+      );
       expect(result).toContain("Max tolerance must be a number.");
       expect(result).toContain("Matching sensitivity must be between 0 and 1.");
     });

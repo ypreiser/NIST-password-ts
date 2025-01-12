@@ -21,9 +21,8 @@ async function validatePassword(
   // Helper to manage error limit
   const addErrors = (newErrors: string[]) => {
     const remainingLimit = errorLimit - errors.length;
-    if (remainingLimit > 0) {
-     errors.push(...newErrors.slice(0, remainingLimit));
-    }
+      errors.push(...newErrors.slice(0, remainingLimit));
+
   };
 
   // Input validation
