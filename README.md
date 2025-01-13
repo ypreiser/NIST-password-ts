@@ -86,7 +86,7 @@ async function checkCustomPassword() {
     blocklist: ["password"], // Custom blocklist
     matchingSensitivity: 0.2, // Custom matching sensitivity (default: 0.25)
     trimWhitespace: true, // Handle leading/trailing whitespace (default: true)
-    errorLimit: 3, // Amount of errors to Check (defult: infinty) 
+    errorLimit: 3, // Amount of errors to check before stopping (defult: infinty) 
   });
 
   if (!result.isValid) {
