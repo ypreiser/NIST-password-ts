@@ -1,6 +1,7 @@
+// nist-password-validator\src\tests\validatePassword.test.ts
 import { describe, it, expect } from "vitest";
-import { validatePassword } from "../index";
-import type { ValidationOptions } from "../types";
+import { validatePassword } from "../validatePassword ";
+import { ValidationOptions } from "../types";
 
 describe("Password Validation", () => {
   describe("Happy Path", () => {
@@ -172,7 +173,6 @@ describe("Password Validation", () => {
         options: {
           blocklist: ["password"],
           matchingSensitivity: 0.3,
-          minEditDistance: 1,
           maxEditDistance: 5,
         },
       },

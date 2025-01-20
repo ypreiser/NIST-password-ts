@@ -1,3 +1,4 @@
+// nist-password-validator\src\validators\inputValidator.ts
 // src\validators\inputValidator.ts
 
 import { ValidationOptions } from "../types";
@@ -78,24 +79,8 @@ export function validateInput(
     errors.push("Matching sensitivity must be between 0 and 1.");
   }
 
-  if (options.minEditDistance && typeof options.minEditDistance !== "number") {
-    errors.push("Min tolerance must be a number.");
-  }
-
   if (options.maxEditDistance && typeof options.maxEditDistance !== "number") {
     errors.push("Max tolerance must be a number.");
-  }
-
-  if (
-    options.minEditDistance &&
-    options.maxEditDistance &&
-    options.minEditDistance > options.maxEditDistance
-  ) {
-    errors.push("Min tolerance cannot be greater than maximum tolerance.");
-  }
-
-  if (options.minEditDistance && options.minEditDistance < 0) {
-    errors.push("Min tolerance must be greater than or equal to 0.");
   }
 
   if (options.maxEditDistance && options.maxEditDistance < 0) {
