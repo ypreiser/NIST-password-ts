@@ -172,9 +172,6 @@ describe("Input Validator", () => {
     it("should reject errorLimit less than 1", () => {
       const options = createOptions({ errorLimit: 0 });
       const result = validateInput("validPassword", options);
-      console.log(result);
-      console.log(options);
-
       expect(result).toEqual([
         "Error limit must be greater than or equal to 1.",
       ]);

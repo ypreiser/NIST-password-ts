@@ -44,8 +44,6 @@ describe("blocklistValidator", () => {
       const result = blocklistValidator("ComplexPass", ["Complete"], {
         customDistanceCalculator,
       });
-      console.log(result);
-
       expect(result.isValid).toBe(true);
     });
   });

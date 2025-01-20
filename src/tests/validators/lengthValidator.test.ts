@@ -2,7 +2,6 @@
 import { describe, expect, it } from "vitest";
 import { lengthValidator } from "../../validators/lengthValidator";
 import type { ValidationResult } from "../../types";
-import { getUtf8Length } from "../../utils/utf8Length";
 
 describe("Length Validator", () => {
   // Test utilities
@@ -156,7 +155,6 @@ describe("Length Validator", () => {
     it("should handle special Unicode characters correctly", () => {
       // Test with zero-width joiners and other special Unicode characters
       const password = "👨‍👩‍👧‍👦👨‍👨‍👧‍👦"; // Family emojis with ZWJ sequences
-      console.log(getUtf8Length(password));
       const result = lengthValidator(password, 2, 15);
       expect(result).toEqual(createValidationResult(true));
     });
