@@ -30,8 +30,6 @@ export function blocklistValidator(
 ): { isValid: boolean; errors: string[] } {
   const {
     matchingSensitivity = 0.25,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    minEditDistance = 0,
     maxEditDistance = 5,
     customDistanceCalculator,
     trimWhitespace = true,

@@ -48,7 +48,6 @@ async function validatePassword(
     const blocklistResult = blocklistValidator(password, options.blocklist, {
       trimWhitespace: options.trimWhitespace,
       matchingSensitivity: options.matchingSensitivity,
-      minEditDistance: options.minEditDistance,
       maxEditDistance: options.maxEditDistance,
       customDistanceCalculator: options.customDistanceCalculator,
       errorLimit: errorLimit - errors.length, // Adjust error limit based on current errors

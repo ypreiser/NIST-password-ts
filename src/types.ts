@@ -8,7 +8,6 @@ export type ValidationOptions = {
   maxLength?: number; // Maximum allowed password length
   blocklist?: string[]; // List of blocked terms for validation
   matchingSensitivity?: number; // Default: 0.25 - Controls how strict the matching is based on the length of the blocklist terms.
-  minEditDistance?: number; // Disabled! - Allways 0 to prevent false positives.
   maxEditDistance?: number; // Default: 5 -  Maximum allowed character differences for fuzzy matching.
   hibpCheck?: boolean; // Flag to enable or disable HIBP breach checks
   customDistanceCalculator?: (term: string, password: string) => number; // Custom function for tolerance calculation
