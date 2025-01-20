@@ -75,6 +75,49 @@ async function checkPassword() {
 checkPassword();
 ```
 
+#### **Using the PasswordValidator Class**
+
+For scenarios where you need to reuse the same validation configuration or update it dynamically:
+
+```typescript
+import { PasswordValidator } from "nist-password-validator";
+
+// Create a validator with initial options
+const validator = new PasswordValidator({
+  minLength: 8,
+  maxLength: 64,
+  blocklist: ["password", "admin"],
+});
+
+// Validate a password
+async function validateWithClass() {
+  const result = await validator.validate("mypassword123");
+  console.log(result.isValid ? "Valid!" : "Invalid:", result.errors);
+}
+
+// Update configuration as needed
+validator.updateConfig({
+  minLength: 12, // This will merge with existing config
+  errorLimit: 2,
+});
+
+// Validate again with new config
+validateWithClass();
+```
+
+The `PasswordValidator` class provides several benefits:
+
+- **Reusable Configuration**: Create a validator instance with your preferred settings
+- **Dynamic Updates**: Change validation rules on the fly with `updateConfig`
+- **Consistent Validation**: Ensure the same rules are applied across multiple password checks
+- **Memory Efficient**: Reuse the same validator instance instead of creating new configurations
+
+Methods:
+
+- `constructor(options?: ValidationOptions)`: Create a new validator with optional initial options
+- `validate(password: string): Promise<ValidationResult>`: Validate a password using current configuration
+- `updateConfig(options: ValidationOptions): void`: Update the current configuration by merging new options
+
 #### **Custom Configuration**
 
 ```typescript
@@ -86,7 +129,7 @@ async function checkCustomPassword() {
     blocklist: ["password"], // Custom blocklist
     matchingSensitivity: 0.2, // Custom matching sensitivity (default: 0.25)
     trimWhitespace: true, // Handle leading/trailing whitespace (default: true)
-    errorLimit: 3, // Amount of errors to check before stopping (defult: infinty) 
+    errorLimit: 3, // Amount of errors to check before stopping (defult: infinty)
   });
 
   if (!result.isValid) {
@@ -169,7 +212,9 @@ Handles leading/trailing whitespace in passwords for NIST compliance. Enabled by
 const result1 = await validatePassword("  mypassword  ");
 
 // Disable trimming
-const result2 = await validatePassword("  mypassword  ", { trimWhitespace: false });
+const result2 = await validatePassword("  mypassword  ", {
+  trimWhitespace: false,
+});
 ```
 
 ---
@@ -185,7 +230,7 @@ const result2 = await validatePassword("  mypassword  ", { trimWhitespace: false
 
 ### **Contributing**
 
-We welcome contributions! Fork the repo, create a branch, and submit a pull request. 
+We welcome contributions! Fork the repo, create a branch, and submit a pull request.
 
 ---
 

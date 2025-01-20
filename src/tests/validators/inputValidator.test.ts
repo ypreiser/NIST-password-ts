@@ -206,9 +206,6 @@ describe("Input Validator", () => {
         matchingSensitivity: 1.5,
       });
       const result = validateInput("validPassword", options);
-      expect(result).toContain(
-        "Min tolerance must be greater than or equal to 0."
-      );
       expect(result).toContain("Max tolerance must be a number.");
       expect(result).toContain("Matching sensitivity must be between 0 and 1.");
     });

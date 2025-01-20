@@ -1,149 +1,70 @@
 // nist-password-validator\src\tests\utils\createPasswordValidator.test.ts
-import { describe, it, expect, vi } from "vitest";
-import { createPasswordValidator } from "../../utils/createPasswordValidator";
-import { validatePassword } from "../../validatePassword ";
-import { ValidationOptions } from "../../types";
+import { describe, it, expect } from "vitest";
+import { PasswordValidator } from "../../utils/createPasswordValidator";
 
-vi.mock("../validatePassword", () => ({
-  validatePassword: vi.fn(),
-}));
-
-describe("createPasswordValidator", () => {
-  describe("Happy Path", () => {
-    it("should return a reusable validator object with default options", async () => {
-      const validator = createPasswordValidator();
-      const mockResult = { isValid: true, errors: [] };
-
-      // Mocking validatePassword behavior
-      (validatePassword as any).mockResolvedValue(mockResult);
-
-      const result = await validator.validate("validPassword123");
-      expect(validatePassword).toHaveBeenCalledWith("validPassword123", {});
-      expect(result).toEqual(mockResult);
+describe("createPasswordValidator Tests", () => {
+  it("should validate passwords with specified options", async () => {
+    const validator = new PasswordValidator({
+      minLength: 8,
+      maxLength: 64,
+      errorLimit: 1,
     });
 
-    it("should validate passwords using pre-configured options", async () => {
-      const options: ValidationOptions = {
-        minLength: 10,
-        maxLength: 64,
-        hibpCheck: false,
-        blocklist: ["password123"],
-      };
-      const validator = createPasswordValidator(options);
-      const mockResult = { isValid: true, errors: [] };
+    const result = await validator.validate("StrongPass123!💂");
+    console.log(result);
 
-      (validatePassword as any).mockResolvedValue(mockResult);
-
-      const result = await validator.validate("customValidPassword");
-      expect(validatePassword).toHaveBeenCalledWith(
-        "customValidPassword",
-        options
-      );
-      expect(result).toEqual(mockResult);
-    });
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
   });
 
-  describe("Sad Path", () => {
-    it("should propagate validation errors from validatePassword", async () => {
-      const options: ValidationOptions = { minLength: 8 };
-      const validator = createPasswordValidator(options);
-      const mockResult = {
-        isValid: false,
-        errors: ["Password must be at least 8 characters."],
-      };
+  it("should create validator with default options", async () => {
+    const validator = new PasswordValidator();
+    const result = await validator.validate("StrongPass123!💂");
 
-      (validatePassword as any).mockResolvedValue(mockResult);
-
-      const result = await validator.validate("short");
-      expect(validatePassword).toHaveBeenCalledWith("short", options);
-      expect(result).toEqual(mockResult);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Password must be at least 8 characters.");
-    });
-
-    it("should handle invalid input to the validator", async () => {
-      const validator = createPasswordValidator();
-      const mockResult = {
-        isValid: false,
-        errors: ["Password cannot be empty."],
-      };
-
-      (validatePassword as any).mockResolvedValue(mockResult);
-
-      const result = await validator.validate("");
-      expect(validatePassword).toHaveBeenCalledWith("", {});
-      expect(result).toEqual(mockResult);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Password cannot be empty.");
-    });
-
-    it("should correctly use the options provided when creating the validator", async () => {
-      const options: ValidationOptions = {
-        minLength: 12,
-        blocklist: ["weakpassword"],
-        hibpCheck: true,
-      };
-      const validator = createPasswordValidator(options);
-
-      const mockResult = {
-        isValid: false,
-        errors: ["Password has been compromised in a data breach."],
-      };
-
-      (validatePassword as any).mockResolvedValue(mockResult);
-
-      const result = await validator.validate("weakpassword");
-      expect(validatePassword).toHaveBeenCalledWith("weakpassword", options);
-      expect(result).toEqual(mockResult);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        "Password has been compromised in a data breach."
-      );
-    });
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
   });
 
-  describe("Edge Cases", () => {
-    it("should handle complex options and still validate correctly", async () => {
-      const options: ValidationOptions = {
-        minLength: 8,
-        maxLength: 20,
-        blocklist: ["password", "12345"],
-        hibpCheck: false,
-        errorLimit: 2,
-      };
-      const validator = createPasswordValidator(options);
-
-      const mockResult = {
-        isValid: false,
-        errors: [
-          "Password must not exceed 20 characters.",
-          'Password contains a substring too similar to: "password".',
-        ],
-      };
-
-      (validatePassword as any).mockResolvedValue(mockResult);
-
-      const result = await validator.validate("password12345");
-      expect(validatePassword).toHaveBeenCalledWith("password12345", options);
-      expect(result).toEqual(mockResult);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toHaveLength(2);
+  it("should update configuration and validate with new options", async () => {
+    const validator = new PasswordValidator({
+      minLength: 8,
     });
 
-    it("should use default options when invalid options are provided", async () => {
-      const invalidOptions: ValidationOptions = { minLength: -1 } as any;
-      const validator = createPasswordValidator(invalidOptions);
+    // First validation with initial config
+    let result = await validator.validate("StrongPass123!💂");
+    expect(result.isValid).toBe(true);
 
-      const mockResult = {
-        isValid: false,
-        errors: ["Password must be at least 8 characters."],
-      };
-
-      (validatePassword as any).mockResolvedValue(mockResult);
-
-      const result = await validator.validate("short");
-      expect(validatePassword).toHaveBeenCalledWith("short", invalidOptions);
-      expect(result).toEqual(mockResult);
+    // Update config to be more strict
+    validator.updateConfig({
+      minLength: 12,
+      blocklist: ["StrongPass"],
     });
+
+    // Validate with updated config
+    result = await validator.validate("StrongPass123!💂");
+    expect(result.isValid).toBe(false);
+  });
+
+  it("should fail validation for short passwords", async () => {
+    const validator = new PasswordValidator({
+      minLength: 12,
+    });
+
+    const result = await validator.validate("short");
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain("Password must be at least 12 characters.");
+  });
+
+  it("should respect error limits", async () => {
+    const validator = new PasswordValidator({
+      minLength: 8,
+      maxLength: 16,
+      blocklist: ["12345"],
+      errorLimit: 1,
+    });
+
+    const result = await validator.validate("12345");
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toHaveLength(1); // Stops at error limit
   });
 });
