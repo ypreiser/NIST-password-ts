@@ -12,5 +12,5 @@
     "types": ["node", "vitest"],
     "moduleResolution": "nodenext"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "src/tests"]
 }

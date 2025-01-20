@@ -1,4 +1,5 @@
 // nist-password-validator\src\tests\validators\blocklistValidator.test.ts
+// nist-password-validator\tests\validators\blocklistValidator.test.ts
 import { describe, it, expect, vi } from "vitest";
 import { blocklistValidator } from "../../validators/blocklistValidator";
 import * as levenshteinModule from "../../utils/levenshteinDistance";

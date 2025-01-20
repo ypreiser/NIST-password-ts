@@ -1,3 +1,4 @@
+// nist-password-validator\src\tests\validators\hibpValidator.test.ts
 import { hibpValidator, generateSHA1 } from '../../validators/hibpValidator';
 import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest';
 import type { ValidationResult } from "../../types";

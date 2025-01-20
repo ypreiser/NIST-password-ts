@@ -1,3 +1,4 @@
+// nist-password-validator\src\tests\validators\lengthValidator.test.ts
 import { describe, expect, it } from "vitest";
 import { lengthValidator } from "../../validators/lengthValidator";
 import type { ValidationResult } from "../../types";
@@ -43,7 +44,7 @@ describe("Length Validator", () => {
 
   describe("Unicode Handling", () => {
     it("should correctly validate unicode emoji characters", () => {
-      const password = "🎉🎊🎈🎂🎁"      
+      const password = "🎉🎊🎈🎂🎁";
       const result = lengthValidator(password, 5, 10);
       expect(result).toEqual(createValidationResult(true));
     });
@@ -55,7 +56,7 @@ describe("Length Validator", () => {
 
     it("should correctly count surrogate pairs", () => {
       // Using characters that require surrogate pairs
-      const password = "Hello🌍🎉"
+      const password = "Hello🌍🎉";
       const result = lengthValidator(password, 7, 64);
       expect(result).toEqual(createValidationResult(true));
     });
