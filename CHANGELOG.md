@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ---
 
+## [3.0.1] - 2025-01-23
+
+### removed
+
+- unused devDependencies: vite, semantic-release
+
+----
+
 ## [3.0.0] - 2025-01-20
 
 ### Added
