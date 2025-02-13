@@ -1,4 +1,3 @@
-// nist-password-validator\src\validators\inputValidator.ts
 // src\validators\inputValidator.ts
 
 import { ValidationOptions } from "../types";
