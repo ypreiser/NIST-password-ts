@@ -24,18 +24,24 @@ class PasswordValidator {
    * @param {ValidationOptions} options - New validation options.
    */
   updateConfig(options: ValidationOptions): void {
-    // Update trimWhitespace if provided
+    console.log("Current options:", this.options);
+    console.log("Current blocklist:", Array.from(this.normalizedBlocklist));
+
+    // Ensure trimWhitespace is updated first
     if (options.trimWhitespace !== undefined) {
       this.trimWhitespace = options.trimWhitespace;
     }
 
-    // Update the existing options
-    this.options = { ...this.options, ...options };
-
-    // If a new blocklist is provided, update the normalized blocklist
-    if (options.blocklist) {
+    // If a new blocklist is provided, update it first
+    if (options.blocklist !== undefined) {
+      this.normalizedBlocklist.clear(); // Ensure it's fully reset
       this.setBlocklist(options.blocklist);
     }
+
+    // Finally, merge other options (blocklist is already updated)
+    this.options = { ...this.options, ...options };
+    console.log("Updated options:", this.options);
+    console.log("Updated blocklist:", Array.from(this.normalizedBlocklist));
   }
 
   setBlocklist(blocklist: string[]) {
