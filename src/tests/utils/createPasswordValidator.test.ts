@@ -1,9 +1,23 @@
 // nist-password-validator\src\tests\utils\createPasswordValidator.test.ts
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { PasswordValidator } from "../../utils/createPasswordValidator";
 
 describe("createPasswordValidator Tests", () => {
+  beforeEach(() => {
+    global.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("should validate passwords with specified options", async () => {
+    // Mock HIBP API response for non-breached password
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      text: async () => "ABCDE:2\nFGHIJ:3",
+    } as Response);
+
     const validator = new PasswordValidator({
       minLength: 8,
       maxLength: 64,
@@ -18,6 +32,12 @@ describe("createPasswordValidator Tests", () => {
   });
 
   it("should create validator with default options", async () => {
+    // Mock HIBP API response for non-breached password
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      text: async () => "ABCDE:2\nFGHIJ:3",
+    } as Response);
+
     const validator = new PasswordValidator();
     const result = await validator.validate("StrongPass123!💂");
 
@@ -29,6 +49,7 @@ describe("createPasswordValidator Tests", () => {
     const validator = new PasswordValidator({
       minLength: 8,
       blocklist: ["password"],
+      hibpCheck: false, // Disable HIBP for this test
     });
 
     // Validate with initial config
@@ -53,6 +74,7 @@ describe("createPasswordValidator Tests", () => {
   it("should fail validation for short passwords", async () => {
     const validator = new PasswordValidator({
       minLength: 12,
+      hibpCheck: false,
     });
 
     const result = await validator.validate("short");
@@ -66,6 +88,7 @@ describe("createPasswordValidator Tests", () => {
       maxLength: 16,
       blocklist: ["12345"],
       errorLimit: 1,
+      hibpCheck: false,
     });
 
     const result = await validator.validate("12345");
@@ -78,6 +101,7 @@ describe("createPasswordValidator Tests", () => {
       minLength: "invalid" as any,
       maxLength: "invalid" as any,
       errorLimit: 1,
+      hibpCheck: false,
     });
 
     const result = await validator.validate("");
@@ -91,6 +115,7 @@ describe("createPasswordValidator Tests", () => {
       maxLength: 10,
       blocklist: ["test"],
       errorLimit: 2,
+      hibpCheck: false,
     });
 
     const result = await validator.validate("thisisaverylongpasswordtest");
@@ -105,6 +130,7 @@ describe("createPasswordValidator Tests", () => {
       minLength: 20,
       blocklist: ["test", "password", "admin"],
       errorLimit: 2,
+      hibpCheck: false,
     });
 
     const result = await validator.validate("testpassword");
@@ -116,11 +142,53 @@ describe("createPasswordValidator Tests", () => {
     const validator = new PasswordValidator({
       maxLength: 5,
       errorLimit: 1,
+      hibpCheck: false,
     });
 
     const result = await validator.validate("toolongpassword");
     expect(result.isValid).toBe(false);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0]).toContain("Password must not exceed 5 characters.");
+  });
+
+  it("should check password against HIBP by default", async () => {
+    // SHA1("password") = 5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8
+    // First 5 chars: 5BAA6, remaining: 1E4C9B93F3F0682250B6CF8331B7EE68FD8
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      text: async () => "1E4C9B93F3F0682250B6CF8331B7EE68FD8:1337",
+    } as Response);
+
+    const validator = new PasswordValidator({
+      minLength: 8,
+    });
+
+    const result = await validator.validate("password");
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain("Password has been compromised in a data breach.");
+  });
+
+  it("should allow disabling HIBP check", async () => {
+    const validator = new PasswordValidator({
+      minLength: 8,
+      hibpCheck: false,
+    });
+
+    const result = await validator.validate("password");
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
+
+  it("should handle HIBP API errors gracefully", async () => {
+    // Mock HIBP API failure
+    global.fetch = vi.fn().mockRejectedValueOnce(new Error("Network error"));
+
+    const validator = new PasswordValidator({
+      minLength: 8,
+    });
+
+    const result = await validator.validate("testpassword123");
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain("Unable to verify password against breach database. Please try again later.");
   });
 });

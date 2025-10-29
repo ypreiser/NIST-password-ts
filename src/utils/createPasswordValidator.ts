@@ -1,6 +1,7 @@
 // src\utils\createPasswordValidator.ts
 import { validateInput } from "../validators/inputValidator";
 import { blocklistValidator } from "../validators/blocklistValidator";
+import { hibpValidator } from "../validators/hibpValidator";
 import { getUtf8Length } from "../utils/utf8Length";
 import { ValidationOptions, ValidationResult } from "../types";
 
@@ -90,6 +91,12 @@ class PasswordValidator {
       if (errors.length >= errorLimit) {
         return { isValid: false, errors };
       }
+    }
+
+    // HIBP validation
+    if (combinedOptions.hibpCheck !== false) {
+      const hibpResult = await hibpValidator(password);
+      addErrors(hibpResult.errors);
     }
 
     return { isValid: errors.length === 0, errors };
