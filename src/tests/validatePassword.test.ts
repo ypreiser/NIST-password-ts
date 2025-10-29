@@ -1,6 +1,6 @@
 // nist-password-validator\src\tests\validatePassword.test.ts
 import { describe, it, expect } from "vitest";
-import { validatePassword } from "../validatePassword ";
+import { validatePassword } from "../validatePassword";
 import { ValidationOptions } from "../types";
 
 describe("Password Validation", () => {

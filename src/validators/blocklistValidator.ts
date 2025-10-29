@@ -50,9 +50,10 @@ export function blocklistValidator(
   const processedBlocklistSet = new Set(
     blocklist
       .filter((term) => term.trim() !== "") // Remove empty strings
-      .map((term) => (trimWhitespace ? term.trim().toLowerCase() : term.toLowerCase()))
+      .map((term) =>
+        trimWhitespace ? term.trim().toLowerCase() : term.toLowerCase()
+      )
   );
-  
 
   // Helper: Calculate fuzzy tolerance
   const calculateFuzzyTolerance = (term: string) => {
@@ -70,8 +71,6 @@ export function blocklistValidator(
 
   // Helper: Check if a password substring matches a blocklist term
   const isTermBlocked = (blockedWord: string): boolean => {
-    
-
     const fuzzyTolerance = calculateFuzzyTolerance(blockedWord);
 
     // Use Set for exact matching when bypassing fuzzy matching for short terms
