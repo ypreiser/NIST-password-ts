@@ -29,6 +29,7 @@ All notable changes to this project are documented here.
 - Fixed typos in code comments ('defalt' → 'default', 'Allways' → 'Always')
 - Clarified minEditDistance as legacy parameter kept for backward compatibility
 - Updated ESLint config to allow underscore-prefixed unused variables
+- Fixed README.md
 
 ### Quality
 

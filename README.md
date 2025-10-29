@@ -1,4 +1,4 @@
-## **NIST Password Validator Library**
+# **NIST Password Validator Library**
 
 A lightweight, zero-dependency open-source password validator adhering to NIST guidelines.
 
@@ -6,13 +6,13 @@ Try it out: [Test the library with a user-friendly front-end demo site.](https:/
 
 ---
 
-### **Introduction**
+## **Introduction**
 
 This library provides a robust solution for password validation based on the [NIST Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-4/sp800-63b.html). It promotes modern password security with support for Unicode, breach checks, customizable rules, and advanced features like error limits for flexible feedback.
 
 ---
 
-### **Why NIST Guidelines?**
+## **Why NIST Guidelines?**
 
 Passwords are a cornerstone of digital security. The National Institute of Standards and Technology (NIST) has established guidelines to improve password policies with principles like:
 
@@ -27,7 +27,7 @@ This library implements these principles to enhance security and usability.
 
 ---
 
-### **Features**
+## **Features**
 
 - **NIST-Compliant Validation**:
   - Unicode-based minimum/maximum length checks.
@@ -46,7 +46,7 @@ This library implements these principles to enhance security and usability.
 
 ---
 
-### **Installation**
+## **Installation**
 
 Install via npm:
 
@@ -56,9 +56,9 @@ npm install nist-password-validator
 
 ---
 
-### **Usage**
+## **Usage**
 
-#### **Basic Example**
+### **Basic Example**
 
 ```typescript
 import { validatePassword } from "nist-password-validator";
@@ -75,7 +75,7 @@ async function checkPassword() {
 checkPassword();
 ```
 
-#### **Using the PasswordValidator Class**
+### **Using the PasswordValidator Class**
 
 For scenarios where you need to reuse the same validation configuration or update it dynamically:
 
@@ -118,7 +118,7 @@ Methods:
 - `validate(password: string): Promise<ValidationResult>`: Validate a password using current configuration
 - `updateConfig(options: ValidationOptions): void`: Update the current configuration by merging new options
 
-#### **Custom Configuration**
+### **Custom Configuration**
 
 ```typescript
 async function checkCustomPassword() {
@@ -219,7 +219,7 @@ const result2 = await validatePassword("  mypassword  ", {
 
 ---
 
-### **Security Considerations**
+## **Security Considerations**
 
 - Normalize passwords to UTF-8 before hashing.
 - Use local hash databases for HIBP checks in high-security environments.
@@ -228,12 +228,12 @@ const result2 = await validatePassword("  mypassword  ", {
 
 ---
 
-### **Contributing**
+## **Contributing**
 
 We welcome contributions! Fork the repo, create a branch, and submit a pull request.
 
 ---
 
-### **License**
+## **License**
 
 This library is released under the [MIT License](LICENSE).
