@@ -46,9 +46,12 @@ export async function hibpValidator(
         }
       : { isValid: true, errors: [] };
   } catch (error) {
-    const errorMessage = (error as Error).message;
-    console.error("Error during password breach check:", errorMessage);
-    throw new Error(`HaveIBeenPwned check failed: ${errorMessage}`);
+    // Return a validation error instead of throwing to prevent application crashes
+    // This allows validation to continue even if the HIBP API is unavailable
+    return {
+      isValid: false,
+      errors: ["Unable to verify password against breach database. Please try again later."],
+    };
   }
 }
 

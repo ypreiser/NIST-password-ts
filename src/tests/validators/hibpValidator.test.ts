@@ -71,9 +71,11 @@ describe('HIBP Password Validator', () => {
         text: async () => 'Service temporarily unavailable',
       });
 
-      await expect(hibpValidator('password123')).rejects.toThrow(
-        'HaveIBeenPwned check failed: Failed to check password against HaveIBeenPwned API. Status: 500, Details: Service temporarily unavailable'
-      );
+      const result = await hibpValidator('password123');
+      expect(result).toEqual<ValidationResult>({
+        isValid: false,
+        errors: ['Unable to verify password against breach database. Please try again later.'],
+      });
     });
 
     it('should handle network failures gracefully', async () => {
@@ -81,9 +83,11 @@ describe('HIBP Password Validator', () => {
         new Error('Network connection failed')
       );
 
-      await expect(hibpValidator('password123')).rejects.toThrow(
-        'HaveIBeenPwned check failed: Network connection failed'
-      );
+      const result = await hibpValidator('password123');
+      expect(result).toEqual<ValidationResult>({
+        isValid: false,
+        errors: ['Unable to verify password against breach database. Please try again later.'],
+      });
     });
 
     it('should handle malformed API responses', async () => {
@@ -107,9 +111,11 @@ describe('HIBP Password Validator', () => {
         text: async () => 'Rate limit exceeded',
       });
 
-      await expect(hibpValidator('password123')).rejects.toThrow(
-        'HaveIBeenPwned check failed: Failed to check password against HaveIBeenPwned API. Status: 429, Details: Rate limit exceeded'
-      );
+      const result = await hibpValidator('password123');
+      expect(result).toEqual<ValidationResult>({
+        isValid: false,
+        errors: ['Unable to verify password against breach database. Please try again later.'],
+      });
     });
   });
 
