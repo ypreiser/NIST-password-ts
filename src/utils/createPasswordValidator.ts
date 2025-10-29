@@ -1,6 +1,7 @@
 // src\utils\createPasswordValidator.ts
 import { validateInput } from "../validators/inputValidator";
 import { blocklistValidator } from "../validators/blocklistValidator";
+import { getUtf8Length } from "../utils/utf8Length";
 import { ValidationOptions, ValidationResult } from "../types";
 
 class PasswordValidator {
@@ -51,7 +52,7 @@ class PasswordValidator {
     // Validate length
     if (
       combinedOptions.minLength &&
-      password.length < combinedOptions.minLength
+      getUtf8Length(password) < combinedOptions.minLength
     ) {
       addErrors([
         `Password must be at least ${combinedOptions.minLength} characters.`,
@@ -62,7 +63,7 @@ class PasswordValidator {
     }
     if (
       combinedOptions.maxLength &&
-      password.length > combinedOptions.maxLength
+      getUtf8Length(password) > combinedOptions.maxLength
     ) {
       addErrors([
         `Password must not exceed ${combinedOptions.maxLength} characters.`,
