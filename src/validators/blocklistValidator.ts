@@ -5,6 +5,9 @@ import { getUtf8Length } from "../utils/utf8Length";
 /**
  * Validates a password against a blocklist, allowing for fuzzy matching.
  *
+ * Uses Levenshtein distance to detect passwords that are too similar to blocked terms,
+ * preventing common variations like "p@ssw0rd" when "password" is blocked.
+ *
  * @param {string} password - The password to validate.
  * @param {string[] | null | undefined} blocklist - The list of blocked terms.
  * @param {object} [options] - Optional settings to customize validation.
@@ -15,6 +18,34 @@ import { getUtf8Length } from "../utils/utf8Length";
  * @param {boolean} [options.trimWhitespace=true] - Whether to trim leading/trailing whitespace from blocklist terms. Default is true.
  * @param {number} [options.errorLimit=Infinity] - Maximum number of errors to report. Default is Infinity.
  * @returns {ValidationResult} - An object containing a boolean indicating validity and an array of error messages.
+ *
+ * @example
+ * Exact match detection
+ * ```typescript
+ * const result = blocklistValidator("password123", ["password", "admin"]);
+ * // Returns: {
+ * //   isValid: false,
+ * //   errors: ['Password contains a substring too similar to: "password".']
+ * // }
+ * ```
+ *
+ * @example
+ * Fuzzy matching detects variations
+ * ```typescript
+ * const result = blocklistValidator("p@ssw0rd", ["password"]);
+ * // Detects "p@ssw0rd" is similar to "password"
+ * // Returns: {
+ * //   isValid: false,
+ * //   errors: ['Password contains a substring too similar to: "password".']
+ * // }
+ * ```
+ *
+ * @example
+ * Valid password (no matches)
+ * ```typescript
+ * const result = blocklistValidator("MySecurePass123", ["password", "admin"]);
+ * // Returns: { isValid: true, errors: [] }
+ * ```
  */
 export function blocklistValidator(
   password: string,

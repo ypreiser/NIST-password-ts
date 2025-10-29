@@ -4,9 +4,41 @@ import { ValidationResult } from "../types";
 const API_URL = "https://api.pwnedpasswords.com/range/";
 
 /**
- * Checks if the given password has been exposed in a data breach.
+ * Checks if the given password has been exposed in a data breach using the Have I Been Pwned API.
+ *
+ * Uses k-anonymity model: only the first 5 characters of the SHA-1 hash are sent to the API,
+ * ensuring the actual password is never transmitted over the network.
+ *
  * @param {string} password - The password to check.
- * @returns {Promise<ValidationResult>} - `true` if the password is found in breaches, otherwise `false`.
+ * @returns {Promise<ValidationResult>} - Validation result indicating if password was found in breaches.
+ *
+ * @example
+ * Check a compromised password
+ * ```typescript
+ * const result = await hibpValidator("password123");
+ * // Returns: {
+ * //   isValid: false,
+ * //   errors: ["Password has been compromised in a data breach."]
+ * // }
+ * ```
+ *
+ * @example
+ * Check a secure password
+ * ```typescript
+ * const result = await hibpValidator("MyV3ry$ecur3P@ssw0rd!");
+ * // Returns: { isValid: true, errors: [] }
+ * ```
+ *
+ * @example
+ * Handle API errors gracefully
+ * ```typescript
+ * // If HIBP API is unavailable, returns error instead of throwing
+ * const result = await hibpValidator("anypassword");
+ * // May return: {
+ * //   isValid: false,
+ * //   errors: ["Unable to verify password against breach database. Please try again later."]
+ * // }
+ * ```
  */
 export async function hibpValidator(
   password: string
