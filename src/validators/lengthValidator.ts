@@ -12,8 +12,7 @@ import { ValidationResult } from '../types';
 export function lengthValidator(
   password: string,
   min: number = 15,
-  max: number = 100000 //defalt 100K
-
+  max: number = 100000 // default 100K
 ): ValidationResult {
   const length = getUtf8Length(password);
   const errors: string[] = [];

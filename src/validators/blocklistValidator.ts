@@ -9,7 +9,7 @@ import { getUtf8Length } from "../utils/utf8Length";
  * @param {string[] | null | undefined} blocklist - The list of blocked terms.
  * @param {object} [options] - Optional settings to customize validation.
  * @param {number} [options.matchingSensitivity=0.25] - Controls matching strictness based on term length. Default is 0.25 (25%).
- * @param {number} [options.minEditDistance=0] - Disabled! - Allways 0 to prevent false positives.
+ * @param {number} [options.minEditDistance=0] - Disabled! - Always 0 to prevent false positives.
  * @param {number} [options.maxEditDistance=5] - Maximum character differences allowed for fuzzy matches. Default is 5.
  * @param {function} [options.customDistanceCalculator] - Custom function to calculate edit distance.
  * @param {boolean} [options.trimWhitespace=true] - Whether to trim leading/trailing whitespace from blocklist terms. Default is true.
