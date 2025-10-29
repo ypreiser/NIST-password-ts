@@ -4,13 +4,47 @@ All notable changes to this project are documented here.
 
 ---
 
+## [3.0.2] - 2025-01-29
+
+### Fixed
+
+- Fixed inconsistent UTF-8 length checking in `PasswordValidator` class (now uses `getUtf8Length()` consistently)
+- Fixed mutation of input options in `inputValidator` (no longer modifies caller's options object)
+- Fixed HIBP error handling to return validation results instead of throwing exceptions
+- Fixed unused error variable lint error in `hibpValidator`
+- Fixed TypeScript configuration module casing (`nodenext` → `NodeNext`)
+
+### Added
+
+- Added HIBP (Have I Been Pwned) support to `PasswordValidator` class
+- Added comprehensive JSDoc documentation to `PasswordValidator` class with usage examples
+- Added JSDoc examples to all validator functions (lengthValidator, blocklistValidator, hibpValidator)
+- Added `forceConsistentCasingInFileNames` to TypeScript config for cross-platform compatibility
+- Added ESLint ignore patterns for dist, node_modules, and coverage folders
+
+### Changed
+
+- Removed console logging from library code (better separation of concerns)
+- Updated minEditDistance parameter documentation to indicate it's a legacy parameter
+- Fixed typos in code comments ('defalt' → 'default', 'Allways' → 'Always')
+- Clarified minEditDistance as legacy parameter kept for backward compatibility
+- Updated ESLint config to allow underscore-prefixed unused variables
+
+### Quality
+
+- Maintained 100% test coverage (124 tests passing)
+- All lint checks passing (0 errors, 0 warnings)
+- Build successful with updated TypeScript configuration
+
+---
+
 ## [3.0.1] - 2025-01-23
 
 ### removed
 
 - unused devDependencies: vite, semantic-release
 
-----
+---
 
 ## [3.0.0] - 2025-01-20
 
