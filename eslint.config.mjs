@@ -6,6 +6,10 @@ import tsParser from "@typescript-eslint/parser";
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
+  // Ignore dist and other build artifacts
+  {
+    ignores: ["dist/**", "node_modules/**", "coverage/**"],
+  },
   // Base configuration for all TypeScript files
   {
     files: ["src/**/*.ts"],
@@ -18,6 +22,14 @@ export default [
     },
     rules: {
       ...tseslint.configs.recommended.rules,
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
     },
   },
   // Overrides for test files

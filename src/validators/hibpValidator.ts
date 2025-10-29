@@ -77,7 +77,7 @@ export async function hibpValidator(
           errors: ["Password has been compromised in a data breach."],
         }
       : { isValid: true, errors: [] };
-  } catch (error) {
+  } catch (_error) {
     // Return a validation error instead of throwing to prevent application crashes
     // This allows validation to continue even if the HIBP API is unavailable
     return {
