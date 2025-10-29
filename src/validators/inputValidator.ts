@@ -58,10 +58,8 @@ export function validateInput(
   if (options.blocklist) {
     if (!Array.isArray(options.blocklist)) {
       errors.push("Blocklist must be an array.");
-    } else if (options.trimWhitespace !== false) {
-      // Trim blocklist terms if enabled
-      options.blocklist = options.blocklist.map((term) => term.trim());
     }
+    // Note: Trimming is handled by blocklistValidator, no need to mutate here
   }
 
   if (
