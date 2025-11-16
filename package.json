@@ -35,7 +35,7 @@
   "description": "A lightweight, zero-dependencies open-source password validator according to NIST guidelines.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ypreiser/NIST-password-ts.git"
+    "url": "git+https://github.com/ypreiser/NIST-password-ts.git"
   },
   "devDependencies": {
     "@eslint/js": "^9.16.0",
