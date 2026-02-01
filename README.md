@@ -126,6 +126,7 @@ async function checkCustomPassword() {
     minLength: 10, // Custom minimum length (default: 15)
     maxLength: 500000, // Custom maximum length (default: 100K)
     hibpCheck: false, // Disable HIBP check if using local hash database
+    hibpDebounceMs: 300, // Debounce HIBP calls by 300ms (useful for live validation)
     blocklist: ["password"], // Custom blocklist
     matchingSensitivity: 0.2, // Custom matching sensitivity (default: 0.25)
     trimWhitespace: true, // Handle leading/trailing whitespace (default: true)
@@ -225,33 +226,6 @@ const result2 = await validatePassword("  mypassword  ", {
 - Use local hash databases for HIBP checks in high-security environments.
 - Customize blocklists with sensitive or organization-specific terms.
 - Implement rate limiting for external API calls.
-
----
-
-## **Publishing**
-
-This package uses automated npm publishing via GitHub Actions. To publish a new version:
-
-1. **Update version**: `npm version patch|minor|major` (this updates package.json and creates a git tag)
-2. **Push with tags**: `git push origin master --tags`
-3. The GitHub Action will automatically:
-   - Run tests and linting
-   - Build the package
-   - Publish to npm with provenance
-
-### **First-time Setup**
-
-To enable automated publishing, add your npm token to GitHub:
-
-1. Generate an npm access token:
-   - Go to [npmjs.com](https://www.npmjs.com/)
-   - Account Settings → Access Tokens → Generate New Token
-   - Select "Automation" type (for CI/CD)
-2. Add token to GitHub:
-   - Go to your repository → Settings → Secrets and variables → Actions
-   - Click "New repository secret"
-   - Name: `NPM_TOKEN`
-   - Value: (paste your npm token)
 
 ---
 

@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- `hibpDebounceMs` option to debounce HIBP API calls during live validation
+
+---
+
 ## [3.0.3] - 2025-11-13
 
 ### Fixed
