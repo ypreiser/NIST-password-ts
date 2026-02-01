@@ -10,6 +10,7 @@ export type ValidationOptions = {
   matchingSensitivity?: number; // Default: 0.25 - Controls how strict the matching is based on the length of the blocklist terms.
   maxEditDistance?: number; // Default: 5 -  Maximum allowed character differences for fuzzy matching.
   hibpCheck?: boolean; // Flag to enable or disable HIBP breach checks
+  hibpDebounceMs?: number; // Milliseconds to wait after last call before querying HIBP
   customDistanceCalculator?: (term: string, password: string) => number; // Custom function for tolerance calculation
   trimWhitespace?: boolean; // Default: true - Flag to enable or disable trimming of whitespace from password and blocklist terms
   errorLimit?: number

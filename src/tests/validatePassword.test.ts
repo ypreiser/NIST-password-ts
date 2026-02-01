@@ -226,6 +226,17 @@ describe("Password Validation", () => {
         "Password has been compromised in a data breach."
       );
     });
+
+    it("should detect compromised passwords with debounce enabled", async () => {
+      const result = await validatePassword("password", {
+        hibpCheck: true,
+        hibpDebounceMs: 10,
+      });
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain(
+        "Password has been compromised in a data breach."
+      );
+    });
   });
   describe("Error Limit Handling", () => {
     interface ErrorLimitTestCase {

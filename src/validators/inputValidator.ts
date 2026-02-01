@@ -91,5 +91,12 @@ export function validateInput(
     errors.push("Error limit must be greater than or equal to 1.");
   }
 
+  if (
+    options.hibpDebounceMs !== undefined &&
+    (typeof options.hibpDebounceMs !== "number" || options.hibpDebounceMs < 0)
+  ) {
+    errors.push("HIBP debounce must be a non-negative number.");
+  }
+
   return errors;
 }

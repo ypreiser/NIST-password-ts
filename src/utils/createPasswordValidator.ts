@@ -2,6 +2,7 @@
 import { validateInput } from "../validators/inputValidator";
 import { blocklistValidator } from "../validators/blocklistValidator";
 import { hibpValidator } from "../validators/hibpValidator";
+import { debouncedHibpValidator } from "../validators/debouncedHibpValidator";
 import { getUtf8Length } from "../utils/utf8Length";
 import { ValidationOptions, ValidationResult } from "../types";
 
@@ -205,7 +206,9 @@ class PasswordValidator {
 
     // HIBP validation
     if (combinedOptions.hibpCheck !== false) {
-      const hibpResult = await hibpValidator(password);
+      const hibpResult = combinedOptions.hibpDebounceMs
+        ? await debouncedHibpValidator(password, combinedOptions.hibpDebounceMs)
+        : await hibpValidator(password);
       addErrors(hibpResult.errors);
     }
 

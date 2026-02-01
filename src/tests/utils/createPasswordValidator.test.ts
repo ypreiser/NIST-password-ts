@@ -191,4 +191,21 @@ describe("createPasswordValidator Tests", () => {
     expect(result.isValid).toBe(false);
     expect(result.errors).toContain("Unable to verify password against breach database. Please try again later.");
   });
+
+  it("should use debounced HIBP validator when hibpDebounceMs is set", async () => {
+    // SHA1("password") suffix check
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      text: async () => "1E4C9B93F3F0682250B6CF8331B7EE68FD8:1337",
+    } as Response);
+
+    const validator = new PasswordValidator({
+      minLength: 8,
+      hibpDebounceMs: 10,
+    });
+
+    const result = await validator.validate("password");
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain("Password has been compromised in a data breach.");
+  });
 });

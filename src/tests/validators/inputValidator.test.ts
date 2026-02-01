@@ -184,6 +184,32 @@ describe("Input Validator", () => {
     });
   });
 
+  describe("HIBP Debounce Validation", () => {
+    it("should accept valid hibpDebounceMs", () => {
+      const options = createOptions({ hibpDebounceMs: 300 });
+      const result = validateInput("validPassword", options);
+      expect(result).toEqual([]);
+    });
+
+    it("should accept zero hibpDebounceMs", () => {
+      const options = createOptions({ hibpDebounceMs: 0 });
+      const result = validateInput("validPassword", options);
+      expect(result).toEqual([]);
+    });
+
+    it("should reject negative hibpDebounceMs", () => {
+      const options = createOptions({ hibpDebounceMs: -100 });
+      const result = validateInput("validPassword", options);
+      expect(result).toEqual(["HIBP debounce must be a non-negative number."]);
+    });
+
+    it("should reject invalid hibpDebounceMs type", () => {
+      const options = createOptions({ hibpDebounceMs: "300" as any });
+      const result = validateInput("validPassword", options);
+      expect(result).toEqual(["HIBP debounce must be a non-negative number."]);
+    });
+  });
+
   describe("Edge Cases", () => {
     it("should handle all options being undefined", () => {
       const result = validateInput("validPassword", {});
