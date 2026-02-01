@@ -202,6 +202,19 @@ import { hibpValidator } from "nist-password-validator";
 hibpValidator("mypassword123").then((result) => console.log(result.errors));
 ```
 
+#### **HIBP Debouncing**
+
+For live validation (e.g., as the user types), use `hibpDebounceMs` to prevent rapid API calls:
+
+```typescript
+const result = await validatePassword("mypassword", {
+  hibpDebounceMs: 300, // Wait 300ms after last keystroke before calling HIBP
+});
+```
+
+- **Default**: Disabled (HIBP calls are immediate)
+- When set, groups rapid calls and executes only after the delay passes
+
 ---
 
 ### **Whitespace Handling**
